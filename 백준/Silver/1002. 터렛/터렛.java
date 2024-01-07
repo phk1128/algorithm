@@ -18,14 +18,13 @@ public class Main {
         if (Objects.equals(repeate,count)) {
             return;
         }
-        String input = br.readLine();
-        String[] splitInput = input.split(" ");
-        double x1 = Double.parseDouble(splitInput[0]);
-        double y1 = Double.parseDouble(splitInput[1]);
-        double r1 = Double.parseDouble(splitInput[2]);
-        double x2 = Double.parseDouble(splitInput[3]);
-        double y2 = Double.parseDouble(splitInput[4]);
-        double r2 = Double.parseDouble(splitInput[5]);
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        double x1 = Double.parseDouble(st.nextToken());
+        double y1 = Double.parseDouble(st.nextToken());
+        double r1 = Double.parseDouble(st.nextToken());
+        double x2 = Double.parseDouble(st.nextToken());
+        double y2 = Double.parseDouble(st.nextToken());
+        double r2 = Double.parseDouble(st.nextToken());
 
         double distance = Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 0.5);
         if (!isAllZeroPosition(x1, y1, r1, x2, y2, r2) && !isSamePosition(x1, y1, r1, x2, y2, r2)) {
@@ -40,7 +39,6 @@ public class Main {
                 answer.add(0);
             }
         }
-
         if (!isAllZeroPosition(x1, y1, r1, x2, y2, r2) && isSamePosition(x1, y1, r1, x2, y2, r2)) {
             answer.add(-1);
         }
@@ -69,7 +67,7 @@ public class Main {
                 Objects.equals(distance, Math.abs(r1+r2));
     }
 
-   private static boolean isZeroPoint(double distance ,double r1, double r2) {
+    private static boolean isZeroPoint(double distance ,double r1, double r2) {
         return distance > Math.abs(r1+r2) ||
                 distance < Math.abs(r1-r2);
     }
