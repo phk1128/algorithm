@@ -10,7 +10,9 @@ class Solution {
             giftIndexs.put(friend, 0);
         }
         for (String friend : friends) {
-            giftCounts.put(friend, new HashMap<>(giftIndexs));
+            Map<String, Integer> tempGiftIndexs = new HashMap<>(giftIndexs);
+            tempGiftIndexs.remove(friend);
+            giftCounts.put(friend, new HashMap<>(tempGiftIndexs));
         }
         
         for (String gift : gifts) {
@@ -33,28 +35,23 @@ class Solution {
             int result = 0;
             
             for (String taker : giverGiftCount.keySet()) {
-                if (!Objects.equals(giver, taker)) {
-                    int takerGiftIndex = giftIndexs.get(taker);
-                    Map<String, Integer> takerGiftCount = giftCounts.get(taker);
-                    if (giverGiftCount.get(taker) > takerGiftCount.get(giver)) {
+                int takerGiftIndex = giftIndexs.get(taker);
+                Map<String, Integer> takerGiftCount = giftCounts.get(taker);
+                if (giverGiftCount.get(taker) > takerGiftCount.get(giver)) {
+                    result++;
+                    continue;
+                }
+                if (giverGiftCount.get(taker) == takerGiftCount.get(giver)) {
+                    if (giverGiftIndex > takerGiftIndex) {
                         result++;
                         continue;
                     }
-                    if (giverGiftCount.get(taker) == takerGiftCount.get(giver)) {
-                        if (giverGiftIndex > takerGiftIndex) {
-                            result++;
-                            continue;
-                        }
-                    }
-                }  
+                }
             }
-            
             if (result >= answer) {
-                answer = result;
+            answer = result;
             }
         }
         return answer;
+        }
     }
-    
-    
-}
