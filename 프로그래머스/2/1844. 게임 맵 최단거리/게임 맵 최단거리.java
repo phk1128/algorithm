@@ -1,59 +1,75 @@
 import java.util.*;
 
 class Solution {
-    static int answer = -1;
-    static boolean[][] visited;
-    static int[] mrow = {-1, 1, 0, 0};
-    static int[] mcol = {0, 0, -1, 1};
-
+    
+    private boolean[][] visitLog;
+    private int limitX;
+    private int limitY;
+    private int answer = -1;
+    private final int[][] directions = {{-1,0},{1,0},{0,-1},{0,1}};
+    
     public int solution(int[][] maps) {
-        visited = new boolean[maps.length][maps[0].length];
-
-        bfs(0, 0, maps);
-
-        return answer;
-    }
-
-    public void bfs(int row, int col, int[][] maps) {
-        List<Node> list = new ArrayList<>();
-
-        list.add(new Node(0, 0, 1));
-        visited[0][0] = true;
-
-        while (!list.isEmpty()) {
-            Node cur = list.remove(0);
-
-            if (cur.row == maps.length - 1 && cur.col == maps[0].length - 1) {
-                answer = cur.count;
-                return;
+        visitLog = new boolean[maps.length][maps[0].length];
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(new Node(0,0,1));
+        
+        limitX = maps[0].length;
+        limitY = maps.length;
+        
+        while(!queue.isEmpty()) {
+            Node node = queue.poll();
+            int x = node.getX();
+            int y = node.getY();
+            int count = node.getCount();
+            
+            if (isArrive(x,y)) {
+                return count;
             }
-
-            for (int i = 0; i < 4; i++) {
-                int nextRow = cur.row + mrow[i];
-                int nextCol = cur.col + mcol[i];
-
-                if (canMove(nextRow, nextCol, maps)) {
-                    visited[nextRow][nextCol] = true;
-                    list.add(new Node(nextRow, nextCol, cur.count + 1));
+            
+            for (int[] direction : directions) {
+                int newX = x + direction[0];
+                int newY = y + direction[1];
+                if (!isAvailableMove(newX, newY, limitX, limitY)) {
+                    continue;
+                }
+                if (maps[newY][newX] == 1 && !visitLog[newY][newX]) {
+                    visitLog[newY][newX] = true;
+                    queue.add(new Node(newX, newY, count+1));
                 }
             }
         }
+        return answer;
     }
-
+    
+    public boolean isAvailableMove(int x, int y, int limitX, int limitY) {
+        return x < limitX && x >= 0 && y < limitY && y >= 0;
+    }
+    
+    public boolean isArrive(int x, int y) {
+        return x == (limitX-1) && y == (limitY-1);
+    }
+    
     class Node {
-        int row;
-        int col;
-        int count;
-
-        public Node(int row, int col, int count) {
-            this.row = row;
-            this.col = col;
+        private int x;
+        private int y;
+        private int count;
+        
+        public Node(int x, int y, int count) {
+            this.x = x;
+            this.y = y;
             this.count = count;
         }
-    }
-
-    public boolean canMove(int row, int col, int[][] maps) {
-        return row >= 0 && row < visited.length && col >= 0 && col < visited[0].length
-                && !visited[row][col] && maps[row][col] != 0;
+        
+        public int getX() {
+            return this.x;
+        }
+        
+        public int getY() {
+            return this.y;
+        }
+        
+        public int getCount() {
+            return this.count;
+        }
     }
 }
