@@ -16,6 +16,8 @@ class Solution {
         limitX = maps[0].length;
         limitY = maps.length;
         
+        visitLog[0][0] = true; // 시작점 방문처리
+        
         while(!queue.isEmpty()) {
             Node node = queue.poll();
             int x = node.getX();
@@ -33,6 +35,7 @@ class Solution {
                     continue;
                 }
                 if (maps[newY][newX] == 1 && !visitLog[newY][newX]) {
+                    // 노드가 중복으로 큐에 들어가는것을 방지하기 위해 큐에 넣기전 노드를 방문처리, 효율성을 통과하기 위한 포인트
                     visitLog[newY][newX] = true;
                     queue.add(new Node(newX, newY, count+1));
                 }
