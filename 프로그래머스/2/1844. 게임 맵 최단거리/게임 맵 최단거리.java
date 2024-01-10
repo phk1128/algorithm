@@ -52,7 +52,7 @@ class Solution {
         return x == (limitX-1) && y == (limitY-1);
     }
     
-    class Node {
+    static class Node {
         private int x;
         private int y;
         private int count;
