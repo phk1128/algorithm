@@ -29,7 +29,7 @@ class Solution {
                     if (value == maxQuantity && value >= 2) {
                         answer.add(entry.getKey());
                     }
-            }
+                }
                 
             }
            
@@ -37,8 +37,6 @@ class Solution {
         Collections.sort(answer);
         return answer;
     }
-        
-    
     public void addCombination(String order, List<String> combination, int start, boolean[] visited, int depth, int quantity) {
         if (quantity == depth) {
             String menus = "";
@@ -57,55 +55,6 @@ class Solution {
             }
         }
     }
-
-//     static class Courses {
-//         private final List<Course> courses;
-        
-//         public Courses() {
-//             this.courses = new ArrayList<>();
-//         }
-        
-//         public List<String> findCourseByQuantity(int quantity) {
-//             return courses.stream()
-//                 .filter(course -> course.getQuantity() == quantity)
-//                 .map(Course::getMenus)
-//                 .collect(Collectors.toList());
-//         }
-        
-//         public void addCourse(String menus) {
-//             courses.add(new Course(menus));
-//         }
-        
-//         public Course findCourseByMenus(String menus) {
-//             return courses.stream().filter(course -> Objects.equals(course.getMenus(), menus)).findAny().orElse(null);
-//         }
-        
-//         private int calculateCourseMaxQuantity() {
-//             return courses.stream().mapToInt(Course::getQuantity).max().orElse(0);
-//         }
-//     }
-    
-//     static class Course {
-//         private final String menus;
-//         private int quantity;
-        
-//         public Course(String menus) {
-//             this.menus = menus;
-//             this.quantity = 1;
-//         }
-        
-//         public String getMenus() {
-//             return menus;
-//         }
-        
-//         public int getQuantity() {
-//             return quantity;
-//         }
-        
-//         public void addQuantity() {
-//             quantity++;
-//         }
-//     }
 }
 
 
