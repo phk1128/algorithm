@@ -12,6 +12,7 @@ class Solution {
         visitLog = new boolean[maps.length][maps[0].length];
         Queue<Node> queue = new LinkedList<>();
         queue.add(new Node(0,0,1));
+        System.out.println(Arrays.deepToString(visitLog));
         
         limitX = maps[0].length;
         limitY = maps.length;
