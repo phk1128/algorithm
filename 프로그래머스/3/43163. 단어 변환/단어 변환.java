@@ -7,7 +7,6 @@ class Solution {
         queue.offer(new Word(begin,answer));
         boolean[] visited = new boolean[words.length];
         
-        
         while (!queue.isEmpty()) {
             Word word = queue.poll();
             
@@ -23,7 +22,7 @@ class Solution {
                         count++;
                     }
                 }
-                if (count >= (splitWord.length-1) && !visited[i]) {
+                if (count == (splitWord.length-1) && !visited[i]) {
                     visited[i] = true;
                     queue.offer(new Word(words[i],word.getAnswer()+1));
                 }
