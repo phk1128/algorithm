@@ -15,6 +15,9 @@ class Solution {
             }
             String[] splitWord = word.getWord().split("");
             for (int i = 0; i < words.length; i++) {
+                if (visited[i]) {
+                    continue;
+                }
                 int count = 0;
                 String[] tempWord = words[i].split("");
                 for (int j = 0; j < splitWord.length; j++) {
