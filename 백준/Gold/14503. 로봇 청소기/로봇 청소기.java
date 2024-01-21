@@ -72,15 +72,14 @@ public class Main {
             cleanRoom(ny, nx, d, true);
         } else {
             for (int i = 0; i < 4; i++) {
-                int nd = (d+(3-i)) % 4;
-                List<Integer> direction = directions.get(nd);
+                d = (d+3) % 4;
+                List<Integer> direction = directions.get(d);
                 int ny = y + direction.get(1);
                 int nx = x + direction.get(0);
                 if ((0 <= nx && nx < mapView.get(0).size() && 0 <= ny && ny < mapView.size())) {
                     if (mapView.get(ny).get(nx) == 0) {
                         y = ny;
                         x = nx;
-                        d = nd;
                         mapView.get(y).set(x, 2);
                         answer++;
                         break;
