@@ -23,19 +23,11 @@ public class Main {
         coins = new ArrayList<>();
         addCoin(0,n);
 
-        for (int i = n-1; i >= 0; i--) {
-            if (coins.get(i) <= k) {
-                while (true) {
-                    if (coins.get(i) > k) {
-                        break;
-                    }
-                    k -= coins.get(i);
-                    answer++;
-                }
-            }
-            if (k == 0) {
-                break;
-            }
+        Collections.sort(coins, Collections.reverseOrder()); // 내림차순으로 정렬
+
+        for (int coin : coins) {
+            answer += k / coin;
+            k = k % coin;
         }
 
         bw.write(String.valueOf(answer));
