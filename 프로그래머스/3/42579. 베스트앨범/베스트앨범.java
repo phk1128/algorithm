@@ -93,7 +93,7 @@ class Solution {
         
         @Override
         public int compareTo(Song s) {
-            // 고유번호 오름 차순
+            // 플레이 횟수가 같을 시 고유번호 오름 차순
             if (this.play == s.play) {
                 return this.uniqueNumber - s.uniqueNumber;
             }
