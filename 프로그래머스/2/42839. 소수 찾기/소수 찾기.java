@@ -4,12 +4,12 @@ class Solution {
     private boolean[] visited;
     private String numbers;
     private int answer;
-    private List<Integer> primeNumbers;
+    private Set<Integer> primeNumbers;
     
     public int solution(String numbers) {
         visited = new boolean[numbers.length()];
         this.numbers = numbers;
-        this.primeNumbers = new ArrayList<>();
+        this.primeNumbers = new HashSet<>();
         answer = 0;
         
         for (int i = 1; i <= numbers.length(); i++) {
@@ -49,7 +49,6 @@ class Solution {
         if (number == 1) {
             return false;
         }
-        
         
         for (int i = 2; i < (int) Math.pow(number,0.5) + 1; i++) {
             if (number % i == 0) {
