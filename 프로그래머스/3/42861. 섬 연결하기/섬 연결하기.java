@@ -1,86 +1,61 @@
 import java.util.*;
 
 class Solution {
-    private int[] parents;
-    private List<Edge> graph;
     private int answer;
+    private List<Edge>[] graph;
+    private boolean[] visited;
+    
     public int solution(int n, int[][] costs) {
-        parents = new int[n];
-        graph = new ArrayList<>();
         answer = 0;
+        graph = new ArrayList[n];
+        visited = new boolean[n];
         
         for (int i = 0; i < n; i++) {
-            parents[i] = i;
+            graph[i] = new ArrayList<>();
         }
         
         for (int[] cost : costs) {
             int start = cost[0];
             int end = cost[1];
             int weight = cost[2];
-            
-            graph.add(new Edge(start, end, weight));
+        
+            graph[start].add(new Edge(end, weight));
+            graph[end].add(new Edge(start,weight));
         }
         
-        Collections.sort(graph);
-        
-        kruskal();
+        prim();
         
         return answer;
     }
     
-    private void kruskal() {
+    private void prim() {
+        PriorityQueue<Edge> queue = new PriorityQueue<>();
+        queue.offer(new Edge(0,0));
         
-        for (Edge edge : graph) {
-            int start = edge.getStart();
+        while(!queue.isEmpty()) {
+            Edge edge = queue.poll();
             int end = edge.getEnd();
             int weight = edge.getWeight();
             
-            if (unionFind(start, end)) {
-                answer += weight;
+            if (visited[end]) {
+                continue;
+            }
+            visited[end] = true;
+            answer += weight;
+            
+            for (Edge e : graph[end]) {
+                queue.offer(e);
             }
         }
     }
     
-    private int find(int x) {
-        if (parents[x] == x) {
-            return x;
-        }
-        return find(parents[x]);
-    }
-    
-    private boolean unionFind(int x, int y) {
-        x = find(x);
-        y = find(y);
-        
-        if (x == y) {
-            return false;
-        }
-        
-        if (x < y) {
-            parents[y] = x; 
-        }
-        
-        if (x > y) {
-            parents[x] = y;
-        }
-        
-        return true;
-    }
-    
     static class Edge implements Comparable<Edge> {
-        
-        private int start;
         private int end;
         private int weight;
         
-        public Edge(int start, int end, int weight) {
-            this.start = start;
+        public Edge(int end, int weight) {
             this.end = end;
             this.weight = weight;
-        }
-        
-        public int getStart() {
-            return this.start;
         }
         
         public int getEnd() {
