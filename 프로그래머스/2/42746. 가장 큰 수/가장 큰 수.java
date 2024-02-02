@@ -12,10 +12,7 @@ class Solution {
             return -(num1 + num2).compareTo(num2 + num1);
         });
         
-        for (String num : numberList) {
-            if (!Objects.equals(num, "0")) {
-                break;
-            }
+        if (Objects.equals(numberList.get(0), "0")) {
             return "0";
         }
         
