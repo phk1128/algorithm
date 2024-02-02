@@ -1,22 +1,25 @@
-import java.util.*;
-import java.util.stream.*;
+import java.util.Stack;
 
 class Solution {
-    private List<Integer> result;
     public int[] solution(int[] prices) {
-        int[] answer = {};
-        int len = prices.length;
-        result = new ArrayList<>();
-        for (int i = 0; i < len; i++) {
-            int count = 0;
-            for (int j = i + 1; j < len; j++) {
-                count++;
-                if (prices[i] > prices[j])
-                    break;
+        Stack<Integer> beginIdxs = new Stack<>();
+        int i=0;
+        int[] terms = new int[prices.length];
+
+        beginIdxs.push(i);
+        for (i=1; i<prices.length; i++) {
+            while (!beginIdxs.empty() && prices[i] < prices[beginIdxs.peek()]) {
+                int beginIdx = beginIdxs.pop();
+                terms[beginIdx] = i - beginIdx;
             }
-            result.add(count);
+            beginIdxs.push(i);
         }
-        answer = result.stream().mapToInt(n -> n).toArray();
-        return answer;
+        while (!beginIdxs.empty()) {
+            int beginIdx = beginIdxs.pop();
+            // System.out.println(i + " - " + beginIdx + " - "+ 1);
+            terms[beginIdx] = i - beginIdx - 1;
+        }
+
+        return terms;
     }
 }
