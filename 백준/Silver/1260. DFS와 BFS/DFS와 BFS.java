@@ -54,12 +54,13 @@ public class Main {
     }
 
     private static void dfs(int v) {
-        if (!visited[v]) {
-            visited[v] = true;
-            dfsResult += (v + " ");
-            for (int node : graph[v]) {
+        visited[v] = true;
+        dfsResult += (v + " ");
+        for (int node : graph[v]) {
+            if (!visited[node]) {
                 dfs(node);
             }
+
         }
     }
 
