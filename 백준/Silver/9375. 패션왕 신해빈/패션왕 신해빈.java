@@ -69,10 +69,6 @@ public class Main {
             this.clothes = new ArrayList<>();
         }
 
-        public String getType() {
-            return type;
-        }
-
         public List<String> getClothes() {
             return clothes;
         }
