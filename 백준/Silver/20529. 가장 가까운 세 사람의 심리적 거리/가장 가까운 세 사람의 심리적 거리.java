@@ -1,6 +1,5 @@
 import java.util.*;
 import java.io.*;
-import java.util.stream.Collectors;
 
 public class Main {
 
@@ -9,7 +8,7 @@ public class Main {
     private static StringTokenizer st;
     private static StringBuilder sb;
     private static List<String> students;
-    private static boolean[] visited;
+    private static String[] comb;
     private static int min;
 
     public static void main(String[] args) throws IOException {
@@ -21,6 +20,7 @@ public class Main {
         int t = Integer.parseInt(st.nextToken());
 
         sb = new StringBuilder();
+        comb = new String[3];
 
         while (t-- > 0) {
             st = new StringTokenizer(br.readLine());
@@ -36,8 +36,7 @@ public class Main {
                     students.add(student);
                 }
                 min = Integer.MAX_VALUE;
-                visited = new boolean[students.size()];
-                recursiveSolve("", 0);
+                recursiveSolve(0, 0);
             }
             sb.append(min);
             sb.append("\n");
@@ -47,38 +46,31 @@ public class Main {
         bw.close();
     }
 
-    private static void recursiveSolve(String pairs, int start) {
+    private static void recursiveSolve(int depth, int start) {
         if (min == 0) {
             return;
         }
-        if (pairs.split(",").length == 3) {
-            List<String> pairsList = Arrays.stream(pairs.split(",")).collect(Collectors.toList());
-            min = Math.min(combination("", 0, 0, pairsList, new boolean[3]), min);
+        if (depth == 3) {
+            min = Math.min(min, getDist());
             return;
         }
         for (int i = start; i < students.size(); i++) {
-            if (!visited[i]) {
-                visited[i] = true;
-                recursiveSolve(students.get(i) + "," + pairs, i + 1);
-                visited[i] = false;
-            }
+            comb[depth] = students.get(i);
+            recursiveSolve(depth + 1, i + 1);
         }
     }
 
-    private static int combination(String pair, int dist, int start, List<String> pairsList, boolean[] tmpVisited) {
-        if (pair.split(",").length == 2) {
-            for (int i = 0; i < 4; i++) {
-                if (!Objects.equals(pair.split(",")[0].charAt(i), pair.split(",")[1].charAt(i))) {
-                    dist += 1;
-                }
+    private static int getDist() {
+        int dist = 0;
+        for (int i = 0; i < 4; i++) {
+            if (!Objects.equals(comb[0].charAt(i), comb[1].charAt(i))) {
+                dist++;
             }
-            return dist;
-        }
-        for (int i = start; i < pairsList.size(); i++) {
-            if (!tmpVisited[i]) {
-                tmpVisited[i] = true;
-                dist = combination(pairsList.get(i) + "," + pair, dist, i + 1, pairsList, tmpVisited);
-                tmpVisited[i] = false;
+            if (!Objects.equals(comb[0].charAt(i), comb[2].charAt(i))) {
+                dist++;
+            }
+            if (!Objects.equals(comb[1].charAt(i), comb[2].charAt(i))) {
+                dist++;
             }
         }
         return dist;
