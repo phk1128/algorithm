@@ -66,7 +66,7 @@ public class Main {
     }
 
     private static void bfsSolve(int startX, int startY, int initCount) {
-        PriorityQueue<Position> queue = new PriorityQueue<>();
+        Queue<Position> queue = new LinkedList<>();
         queue.offer(new Position(startX, startY, initCount));
         visited[startY][startX] = true;
 
