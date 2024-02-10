@@ -8,7 +8,6 @@ public class Main {
     private static StringTokenizer st;
     private static int m;
     private static int n;
-    private static int[] target;
     private static StringBuilder sb;
 
     public static void main(String[] args) throws IOException {
@@ -27,7 +26,6 @@ public class Main {
             n = Integer.parseInt(st.nextToken());
             int x = Integer.parseInt(st.nextToken()) - 1;
             int y = Integer.parseInt(st.nextToken()) - 1;
-            target = new int[]{x, y};
             boolean flag = false;
 
             for (int i = x; i < (m * n); i += m) {
