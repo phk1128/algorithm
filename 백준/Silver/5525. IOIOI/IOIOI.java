@@ -7,7 +7,7 @@ public class Main {
     private static BufferedWriter bw;
     private static StringTokenizer st;
     private static String[] S;
-    private static List<Stack<String>> stacks;
+    private static int[] dp;
     private static int answer;
 
     public static void main(String[] args) throws IOException {
@@ -23,14 +23,9 @@ public class Main {
 
         st = new StringTokenizer(br.readLine());
         S = st.nextToken().split("");
-        stacks = new ArrayList<>();
+        dp = new int[m];
         answer = 0;
         solve(n, m);
-
-        List<List<Integer>> test = new ArrayList<>();
-
-        test.add(new ArrayList<>());
-        test.add(new ArrayList<>());
 
         bw.write(String.valueOf(answer));
         bw.flush();
@@ -38,28 +33,12 @@ public class Main {
     }
 
     private static void solve(int n, int m) {
-        for (int i = 0; i < m - 1; i++) {
-            if (Objects.equals(S[i], "I")) {
-                Stack<String> newStack = new Stack<>();
-                newStack.push("I");
-                stacks.add(newStack);
-            }
-            for (Stack<String> stack : stacks) {
-                if (stack.isEmpty()) {
-                    continue;
-                }
-                String tmpStr = stack.peek();
-                if (Objects.equals(tmpStr, "I") && Objects.equals(S[i + 1], "O")) {
-                    stack.push("O");
-                } else if (Objects.equals(tmpStr, "O") && Objects.equals(S[i + 1], "I")) {
-                    stack.push("I");
-                } else {
-                    stack.clear();
-                }
-                if (stack.size() == (n * 2) + 1) {
+        for (int i = 1; i < m - 1; i++) {
+            if (Objects.equals(S[i], "O") && Objects.equals(S[i+1], "I")) {
+                dp[i + 1] = dp[i - 1] + 1;
+
+                if (dp[i + 1] >= n && Objects.equals(S[i - (n * 2) + 1], "I"))
                     answer++;
-                    stack.clear();
-                }
             }
         }
     }
