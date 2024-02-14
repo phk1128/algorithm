@@ -6,6 +6,7 @@ public class Main {
     private static BufferedReader br;
     private static BufferedWriter bw;
     private static StringTokenizer st;
+    private static String commands;
 
     public static void main(String[] args) throws IOException {
 
@@ -14,67 +15,68 @@ public class Main {
 
         st = new StringTokenizer(br.readLine());
         int t = Integer.parseInt(st.nextToken());
-        StringBuilder sb = new StringBuilder();
 
+        StringBuilder sb = new StringBuilder();
         while (t-- > 0) {
             st = new StringTokenizer(br.readLine());
-            String commands = st.nextToken();
+            commands = st.nextToken();
             st = new StringTokenizer(br.readLine());
-            int n = Integer.parseInt(st.nextToken());
+            int size = Integer.parseInt(st.nextToken());
             st = new StringTokenizer(br.readLine());
-            String[] inputListSplit = st.nextToken().replace("[", "").replace("]", "").split(",");
-            Deque<String> inputList = new LinkedList<>();
-            for (String input : inputListSplit) {
-                if (!Objects.equals(input, "")) {
-                    inputList.offer(input);
-                }
-            }
-            sb.append(solve(commands, inputList));
+            String inputArray = st.nextToken();
+            String[] inputArraySplit = inputArray.substring(1, inputArray.length() - 1).split(",");
+            int leftIdx = 0;
+            int rightIdx = size - 1;
+            sb.append(solve(inputArraySplit, leftIdx, rightIdx, size));
             sb.append("\n");
         }
 
         bw.write(sb.toString());
         bw.flush();
         bw.close();
-
     }
 
-    private static String solve(String commands, Deque<String> inputList) {
-        boolean flag = true;
-        for (String command : commands.split("")) {
+    private static String solve(String[] inputArraySplit, int leftIdx, int rightIdx, int size) {
+        boolean isReverse = false;
 
+        for (String command : commands.split("")) {
             if (Objects.equals(command, "R")) {
-                flag = !flag;
+                isReverse = !isReverse;
             }
 
             if (Objects.equals(command, "D")) {
-                if (inputList.size() == 0) {
+                if (size == 0) {
                     return "error";
                 }
-                if (flag) {
-                    inputList.removeFirst();
+                if (isReverse) {
+                    rightIdx--;
                 } else {
-                    inputList.removeLast();
+                    leftIdx++;
                 }
+                size--;
             }
         }
+        if (size == 0) {
+            return "[]";
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        while (!inputList.isEmpty()) {
-            String num;
-            if (flag) {
-                num = inputList.removeFirst();
-            } else {
-                num = inputList.removeLast();
-            }
-
-            sb.append(num);
-            if (!inputList.isEmpty()) {
+        if (isReverse) {
+            for (int i = rightIdx; i > leftIdx; i--) {
+                sb.append(inputArraySplit[i]);
                 sb.append(",");
             }
+            sb.append(inputArraySplit[leftIdx]);
+            sb.append("]");
+        } else {
+            for (int i = leftIdx; i < rightIdx; i++) {
+                sb.append(inputArraySplit[i]);
+                sb.append(",");
+            }
+            sb.append(inputArraySplit[rightIdx]);
+            sb.append("]");
         }
-        sb.append("]");
-
         return sb.toString();
     }
 }
