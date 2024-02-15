@@ -70,15 +70,14 @@ public class Main {
         int count = numberMap.getOrDefault(number, 0);
 
         if (count == 0) {
-            return commandD(queue, numberMap);
-        }
-
-        if (count == 1) {
-            numberMap.remove(number);
+            number = commandD(queue, numberMap);
         } else {
-            numberMap.put(number, count - 1);
+            if (count == 1) {
+                numberMap.remove(number);
+            } else {
+                numberMap.put(number, count - 1);
+            }
         }
-
         return number;
     }
 }
