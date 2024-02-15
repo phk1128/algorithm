@@ -19,42 +19,38 @@ public class Main {
         while (t-- > 0) {
             st = new StringTokenizer(br.readLine());
             int n = Integer.parseInt(st.nextToken());
-            Queue<Integer> min = new PriorityQueue<>();
-            Queue<Integer> max = new PriorityQueue<>(Collections.reverseOrder());
-            Map<Integer, Integer> numberMap = new HashMap<>();
+            TreeMap<Integer, Integer> numberMap = new TreeMap<>();
             while (n-- > 0) {
                 st = new StringTokenizer(br.readLine());
                 String command = st.nextToken();
                 int number = Integer.parseInt(st.nextToken());
 
                 if (Objects.equals(command, "I")) {
-                    min.offer(number);
-                    max.offer(number);
                     numberMap.put(number, numberMap.getOrDefault(number, 0) + 1);
                 }
                 if (Objects.equals(command, "D")) {
                     if (numberMap.isEmpty()) {
                         continue;
                     }
-                        if (number == -1) {
-                            commandD(min, numberMap);
-                        }
-                        if (number == 1) {
-                            commandD(max, numberMap);
-                        }
+                    int num = 0;
+                    if (number == -1) {
+                        num = numberMap.firstKey();
+                    }
+                    if (number == 1) {
+                        num = numberMap.lastKey();
+                    }
+                    if (numberMap.put(num, numberMap.get(num) - 1) == 1) {
+                        numberMap.remove(num);
+                    }
                 }
             }
 
             if (numberMap.isEmpty()) {
                 sb.append("EMPTY");
             } else {
-                int number = commandD(max, numberMap);
-                sb.append(number);
+                sb.append(numberMap.lastKey());
                 sb.append(" ");
-                if (!numberMap.isEmpty()) {
-                    number = commandD(min, numberMap);
-                }
-                sb.append(number);
+                sb.append(numberMap.firstKey());
             }
             sb.append("\n");
         }
@@ -62,22 +58,5 @@ public class Main {
         bw.write(sb.toString());
         bw.flush();
         bw.close();
-    }
-
-    private static int commandD(Queue<Integer> queue, Map<Integer, Integer> numberMap) {
-
-        int number = queue.poll();
-        int count = numberMap.getOrDefault(number, 0);
-
-        if (count == 0) {
-            number = commandD(queue, numberMap);
-        } else {
-            if (count == 1) {
-                numberMap.remove(number);
-            } else {
-                numberMap.put(number, count - 1);
-            }
-        }
-        return number;
     }
 }
