@@ -6,7 +6,9 @@ public class Main {
     private static BufferedReader br;
     private static BufferedWriter bw;
     private static StringTokenizer st;
-    private static int[][] dist;
+    private static List<Edge>[] graph;
+    private static int[] dists;
+    private static boolean[] visited;
 
     public static void main(String[] args) throws IOException {
 
@@ -17,45 +19,43 @@ public class Main {
         int n = Integer.parseInt(st.nextToken());
         int e = Integer.parseInt(st.nextToken());
 
-        dist = new int[n + 1][n + 1];
+        graph = new ArrayList[n + 1];
 
         for (int i = 1; i <= n; i++) {
-            Arrays.fill(dist[i], Integer.MAX_VALUE);
-            dist[i][i] = 0;
+            graph[i] = new ArrayList<>();
         }
 
         for (int i = 0; i < e; i++) {
             st = new StringTokenizer(br.readLine());
             int start = Integer.parseInt(st.nextToken());
             int end = Integer.parseInt(st.nextToken());
-            int cost = Integer.parseInt(st.nextToken());
+            int dist = Integer.parseInt(st.nextToken());
 
-            dist[start][end] = cost;
-            dist[end][start] = cost;
-
+            graph[start].add(new Edge(end, dist));
+            graph[end].add(new Edge(start, dist));
         }
 
         st = new StringTokenizer(br.readLine());
         int v1 = Integer.parseInt(st.nextToken());
         int v2 = Integer.parseInt(st.nextToken());
 
-        floydSolve(n);
-
-        int[][] root = new int[][]{{1, v1, v2, n}, {1, v2, v1, n}};
+        int[][] roots = new int[][]{{1, v1, v2, n}, {1, v2, v1, n}};
 
         int min = Integer.MAX_VALUE;
-        for (int i = 0; i < 2; i++) {
+        for (int[] root : roots) {
             int sum = 0;
             boolean flag = true;
-            for (int j = 0; j < 3; j++) {
-                if (dist[root[i][j]][root[i][j + 1]] == Integer.MAX_VALUE) {
+            for (int i = 0; i < root.length - 1; i++) {
+                int dist = dijkstra(root[i], root[i + 1], n);
+                if (dist == Integer.MAX_VALUE) {
                     flag = false;
                     break;
                 }
-                sum += dist[root[i][j]][root[i][j + 1]];
+                sum += dist;
             }
+
             if (flag) {
-                min = Math.min(sum, min);
+                min = Math.min(min, sum);
             }
         }
 
@@ -69,19 +69,56 @@ public class Main {
 
     }
 
-    private static void floydSolve(int n) {
+    private static int dijkstra(int start, int end, int n) {
+        PriorityQueue<Edge> queue = new PriorityQueue<>();
+        dists = new int[n + 1];
+        visited = new boolean[n + 1];
+        Arrays.fill(dists, Integer.MAX_VALUE);
+        dists[start] = 0;
+        queue.offer(new Edge(start, 0));
 
-        for (int k = 1; k <= n; k++) {
-            for (int i = 1; i <= n; i++) {
-                for (int j = 1; j <= n; j++) {
-                    if (dist[i][k] != Integer.MAX_VALUE && dist[k][j] != Integer.MAX_VALUE) {
-                        if (dist[i][j] > dist[i][k] + dist[k][j]) {
-                            dist[i][j] = dist[i][k] + dist[k][j];
-                        }
-                    }
+        while (!queue.isEmpty()) {
+            Edge edge = queue.poll();
+            int node = edge.getNode();
+            int dist = edge.getDist();
+
+            if (visited[node]) {
+                continue;
+            }
+            visited[node] = true;
+
+            for (Edge e : graph[node]) {
+                int next = e.getNode();
+                if (dists[next] > dist + e.getDist()) {
+                    dists[next] = dist + e.getDist();
+                    queue.offer(new Edge(next, dist + e.getDist()));
                 }
             }
         }
+        return dists[end];
+    }
 
+    static class Edge implements Comparable<Edge> {
+
+        private int node;
+        private int dist;
+
+        public Edge(int node, int dist) {
+            this.node = node;
+            this.dist = dist;
+        }
+
+        public int getNode() {
+            return this.node;
+        }
+
+        public int getDist() {
+            return this.dist;
+        }
+
+        @Override
+        public int compareTo(Edge e) {
+            return this.dist - e.dist;
+        }
     }
 }
