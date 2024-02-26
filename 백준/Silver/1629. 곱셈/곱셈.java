@@ -26,7 +26,7 @@ public class Main {
 
     private static long recursiveSolve(int A, int B, int C) {
 
-        if (B == 1 || B == 0) {
+        if (B == 1) {
             return A % C;
         }
 
