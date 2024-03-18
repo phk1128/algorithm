@@ -60,12 +60,37 @@ public class Main {
         directionLog[1][1] = 0;
         recursiveSolve(1, 1, 0, 0);
 
-        bw.write(String.valueOf(answer + 1));
+        bw.write(String.valueOf(answer));
         bw.flush();
         bw.close();
     }
 
     private static void recursiveSolve(int r, int c, int d, int count) {
+
+        directionLog[r][c] = d;
+        mapView[r][c] = -1;
+
+        int newR = r + directions[d][0];
+        int newC = c + directions[d][1];
+
+        if (!(newR >= 1 && newR <= N && newC >= 1 && newC <= N)) {
+            answer = count + 1;
+            return;
+        }
+        if (mapView[newR][newC] == -1) {
+            answer = count + 1;
+            return;
+        }
+
+        if (mapView[newR][newC] == 0) {
+            int tailR = tail[0];
+            int tailC = tail[1];
+            mapView[tailR][tailC] = 0;
+            int dL = directionLog[tailR][tailC];
+            tail = new int[]{tailR + directions[dL][0], tailC + directions[dL][1]};
+        }
+
+        count++;
 
         if (!commands.isEmpty()) {
             Command command = commands.peek();
@@ -85,30 +110,7 @@ public class Main {
             }
         }
 
-        directionLog[r][c] = d;
-        mapView[r][c] = -1;
-
-        int newR = r + directions[d][0];
-        int newC = c + directions[d][1];
-
-        if (!(newR >= 1 && newR <= N && newC >= 1 && newC <= N)) {
-            answer = count;
-            return;
-        }
-        if (mapView[newR][newC] == -1) {
-            answer = count;
-            return;
-        }
-
-        if (mapView[newR][newC] == 0) {
-            int tailR = tail[0];
-            int tailC = tail[1];
-            mapView[tailR][tailC] = 0;
-            int dL = directionLog[tailR][tailC];
-            tail = new int[]{tailR + directions[dL][0], tailC + directions[dL][1]};
-        }
-
-        recursiveSolve(newR, newC, d, count + 1);
+        recursiveSolve(newR, newC, d, count);
     }
 
     static class Command {
