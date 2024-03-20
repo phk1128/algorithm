@@ -12,9 +12,8 @@ public class Main {
     private static List<Integer> totalVirus;
     private static int[] combi;
     private static int[][] directions;
-    private static int virusCount;
+    private static boolean[][] visited;
     private static int emptyZone;
-    private static int target;
     private static int min;
 
     public static void main(String[] args) throws IOException {
@@ -28,7 +27,6 @@ public class Main {
         mapView = new int[N][N];
         totalVirus = new ArrayList<>();
         directions = new int[][]{{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
-        virusCount = 0;
         emptyZone = 0;
 
         for (int r = 0; r < N; r++) {
@@ -37,16 +35,13 @@ public class Main {
                 int number = Integer.parseInt(st.nextToken());
                 if (number == 2) {
                     totalVirus.add((r * N) + c);
-                    virusCount++;
                 }
-
                 if (number == 0) {
                     emptyZone++;
                 }
                 mapView[r][c] = number;
             }
         }
-        target = virusCount + emptyZone;
         combi = new int[M];
         min = Integer.MAX_VALUE;
 
@@ -71,7 +66,7 @@ public class Main {
             for (int c : combi) {
                 combiVirus.add(c);
             }
-            diffusion(combiVirus);
+            diffusion(combiVirus, emptyZone);
             return;
         }
 
@@ -81,18 +76,14 @@ public class Main {
         }
     }
 
-    private static void diffusion(List<Integer> combiVirus) {
+    private static void diffusion(List<Integer> combiVirus, int count) {
         int day = 0;
-        int[][] diffusedMapView = new int[N][N];
-        for (int i = 0; i < N; i++) {
-            diffusedMapView[i] = Arrays.copyOf(mapView[i], N);
-        }
+        visited = new boolean[N][N];
         for (int c : combiVirus) {
-            diffusedMapView[c / N][c % N] = -1;
+            visited[c / N][c % N] = true;
         }
         Queue<List<Integer>> queue = new LinkedList<>();
         queue.offer(combiVirus);
-        int count = 0;
 
         while (!queue.isEmpty()) {
             List<Integer> virus = queue.poll();
@@ -107,30 +98,24 @@ public class Main {
                     if (!(newR >= 0 && newR < N && newC >= 0 && newC < N)) {
                         continue;
                     }
-                    if (diffusedMapView[newR][newC] == 0 || diffusedMapView[newR][newC] == 2) {
-                        if (diffusedMapView[newR][newC] == 0) {
-                            count++;
-                        }
-                        diffusedMapView[newR][newC] = -1;
-                        tmpVirus.add(newR * N + newC);
+                    if (visited[newR][newC] || mapView[newR][newC] == 1) {
+                        continue;
                     }
+                    if (mapView[newR][newC] == 0) {
+                        count--;
+                    }
+                    if (count == 0) {
+                        min = Math.min(min, day + 1);
+                        return;
+                    }
+                    visited[newR][newC] = true;
+                    tmpVirus.add(newR * N + newC);
                 }
             }
-
             if (!tmpVirus.isEmpty()) {
-                if (!totalVirus.containsAll(tmpVirus)) {
-                    day++;
-                    queue.offer(tmpVirus);
-                } else {
-                    if (count + virusCount != target) {
-                        day++;
-                        queue.offer(tmpVirus);
-                    }
-                }
+                day++;
+                queue.offer(tmpVirus);
             }
-        }
-        if (count + virusCount == target) {
-            min = Math.min(min, day);
         }
     }
 }
