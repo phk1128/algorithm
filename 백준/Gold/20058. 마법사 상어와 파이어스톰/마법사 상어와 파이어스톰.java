@@ -20,36 +20,36 @@ public class Main {
         bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
         st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
+        N = (int) Math.pow(2, Integer.parseInt(st.nextToken()));
         int Q = Integer.parseInt(st.nextToken());
-        mapView = new int[(int) Math.pow(2, N)][(int) Math.pow(2, N)];
+        mapView = new int[(int) N][(int) N];
         directions = new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
-        for (int r = 0; r < Math.pow(2, N); r++) {
+        for (int r = 0; r < N; r++) {
             st = new StringTokenizer(br.readLine());
-            for (int c = 0; c < Math.pow(2, N); c++) {
+            for (int c = 0; c < N; c++) {
                 mapView[r][c] = Integer.parseInt(st.nextToken());
             }
         }
         st = new StringTokenizer(br.readLine());
         while (Q-- > 0) {
             int command = Integer.parseInt(st.nextToken());
-            visited = new boolean[(int) Math.pow(2, N)][(int) Math.pow(2, N)];
-            rotatedMapView = new int[(int) Math.pow(2, N)][(int) Math.pow(2, N)];
+            visited = new boolean[N][N];
+            rotatedMapView = new int[N][N];
 
             rotate(0, 0, (int) Math.pow(2, command));
             meltIce();
 
-            for (int i = 0; i < Math.pow(2, N); i++) {
-                mapView[i] = Arrays.copyOf(meltedMapView[i], (int) Math.pow(2, N));
+            for (int i = 0; i < N; i++) {
+                mapView[i] = Arrays.copyOf(meltedMapView[i], N);
             }
 
         }
 
         int max = 0;
-        visited = new boolean[(int) Math.pow(2, N)][(int) Math.pow(2, N)];
-        for (int r = 0; r < Math.pow(2, N); r++) {
-            for (int c = 0; c < Math.pow(2, N); c++) {
+        visited = new boolean[N][N];
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < N; c++) {
                 if (mapView[r][c] == 0 || visited[r][c]) {
                     continue;
                 }
@@ -71,8 +71,8 @@ public class Main {
     private static int iceSum() {
         int sum = 0;
 
-        for (int r = 0; r < Math.pow(2, N); r++) {
-            for (int c = 0; c < Math.pow(2, N); c++) {
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < N; c++) {
                 sum += mapView[r][c];
             }
         }
@@ -87,7 +87,7 @@ public class Main {
             int newR = r + direction[0];
             int newC = c + direction[1];
 
-            if (!(newR >= 0 && newR < Math.pow(2, N) && newC >= 0 && newC < Math.pow(2, N))) {
+            if (!(newR >= 0 && newR < N && newC >= 0 && newC < N)) {
                 continue;
             }
 
@@ -100,10 +100,10 @@ public class Main {
     }
 
     private static void meltIce() {
-        meltedMapView = new int[(int) Math.pow(2, N)][(int) Math.pow(2, N)];
+        meltedMapView = new int[N][N];
 
-        for (int r = 0; r < Math.pow(2, N); r++) {
-            for (int c = 0; c < Math.pow(2, N); c++) {
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < N; c++) {
                 if (rotatedMapView[r][c] == 0) {
                     continue;
                 }
@@ -113,7 +113,7 @@ public class Main {
                     int newR = r + direction[0];
                     int newC = c + direction[1];
 
-                    if (!(newR >= 0 && newR < Math.pow(2, N) && newC >= 0 && newC < Math.pow(2, N))) {
+                    if (!(newR >= 0 && newR < N && newC >= 0 && newC < N)) {
                         continue;
                     }
 
@@ -141,13 +141,13 @@ public class Main {
             }
         }
 
-        if (r + bound < Math.pow(2, N)) {
+        if (r + bound < N) {
             if (!visited[r + bound][c]) {
                 rotate(r + bound, c, bound);
             }
         }
 
-        if (c + bound < Math.pow(2, N)) {
+        if (c + bound < N) {
             if (!visited[r][c + bound]) {
                 rotate(r, c + bound, bound);
             }
