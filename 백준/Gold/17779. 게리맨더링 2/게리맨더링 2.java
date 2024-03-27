@@ -10,6 +10,7 @@ public class Main {
     private static int[][] mapView;
     private static int[][] area;
     private static int[] peopleSum;
+    private static int total;
     private static int[] combi;
     private static int min;
 
@@ -23,11 +24,14 @@ public class Main {
         mapView = new int[N + 1][N + 1];
         combi = new int[4]; // 0 : r , 1: c , 2 : d1 , 3 : d2
         min = Integer.MAX_VALUE;
+        total = 0;
 
         for (int r = 1; r <= N; r++) {
             st = new StringTokenizer(br.readLine());
             for (int c = 1; c <= N; c++) {
-                mapView[r][c] = Integer.parseInt(st.nextToken());
+                int number = Integer.parseInt(st.nextToken());
+                mapView[r][c] = number;
+                total += number;
             }
         }
 
@@ -51,8 +55,7 @@ public class Main {
                     peopleSum = new int[5];
                     generateFive(r, c, d1, d2);
                     generateAnother(r, c, d1, d2);
-                    sumFiveZone();
-
+                    peopleSum[4] = total - peopleSum[0] - peopleSum[1] - peopleSum[2] - peopleSum[3];
                     Arrays.sort(peopleSum);
                     min = Math.min(min, peopleSum[4] - peopleSum[0]);
                 }
@@ -63,17 +66,6 @@ public class Main {
         for (int i = 1; i <= N; i++) {
             combi[depth] = i;
             recursiveSolve(depth + 1);
-        }
-    }
-
-    private static void sumFiveZone() {
-
-        for (int r = 1; r <= N; r++) {
-            for (int c = 1; c <= N; c++) {
-                if (area[r][c] == 5 || area[r][c] == 0) {
-                    peopleSum[4] += mapView[r][c];
-                }
-            }
         }
     }
 
