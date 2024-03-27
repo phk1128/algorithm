@@ -66,36 +66,22 @@ public class Main {
 
     private static void generateFive(int r, int c, int d1, int d2) {
 
-        int newR = r;
-        int newC = c;
-        while (newR <= r + d1 && newC >= c - d1) {
-            area[newR][newC] = 5;
-            newR++;
-            newC--;
+        area[r][c] = 5;
+
+        for (int i = 1; i <= d1; i++) {
+            area[r + i][c - i] = 5;
         }
 
-        newR = r;
-        newC = c;
-        while (newR <= r + d2 && newC <= c + d2) {
-            area[newR][newC] = 5;
-            newR++;
-            newC++;
+        for (int i = 1; i <= d2; i++) {
+            area[r + i][c + i] = 5;
         }
 
-        newR = r + d1;
-        newC = c - d1;
-        while (newR <= r + d1 + d2 && newC <= c - d1 + d2) {
-            area[newR][newC] = 5;
-            newR++;
-            newC++;
+        for (int i = 1; i <= d2; i++) {
+            area[r + d1 + i][c - d1 + i] = 5;
         }
 
-        newR = r + d2;
-        newC = c + d2;
-        while (newR <= r + d2 + d1 && newC >= c + d2 - d1) {
-            area[newR][newC] = 5;
-            newR++;
-            newC--;
+        for (int i = 1; i <= d1; i++) {
+            area[r + d2 + i][c + d2 - i] = 5;
         }
 
         for (int i = 1; i <= N; i++) {
