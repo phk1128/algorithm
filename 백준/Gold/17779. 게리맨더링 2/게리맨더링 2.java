@@ -9,6 +9,7 @@ public class Main {
     private static int N;
     private static int[][] mapView;
     private static int[][] area;
+    private static int[] peopleSum;
     private static int[] combi;
     private static int min;
 
@@ -20,7 +21,6 @@ public class Main {
         st = new StringTokenizer(br.readLine());
         N = Integer.parseInt(st.nextToken());
         mapView = new int[N + 1][N + 1];
-        area = new int[N + 1][N + 1];
         combi = new int[4]; // 0 : r , 1: c , 2 : d1 , 3 : d2
         min = Integer.MAX_VALUE;
 
@@ -47,10 +47,12 @@ public class Main {
 
             if (r <= r + d1 + d2 && r + d1 + d2 <= N) {
                 if (c - d1 >= 1 && c > c - d1 && c < c + d2 && c + d2 <= N) {
+                    area = new int[N + 1][N + 1];
+                    peopleSum = new int[5];
                     generateFive(r, c, d1, d2);
                     generateAnother(r, c, d1, d2);
-                    min = Math.min(min, calculateDiff());
-                    area = new int[N + 1][N + 1];
+                    Arrays.sort(peopleSum);
+                    min = Math.min(min, peopleSum[4] - peopleSum[0]);
                 }
             }
             return;
@@ -60,27 +62,6 @@ public class Main {
             combi[depth] = i;
             recursiveSolve(depth + 1);
         }
-    }
-
-    private static int calculateDiff() {
-
-        int tmpMin = Integer.MAX_VALUE;
-        int tmpMax = 0;
-
-        for (int i = 1; i <= 5; i++) {
-            int sum = 0;
-            for (int r = 1; r <= N; r++) {
-                for (int c = 1; c <= N; c++) {
-                    if (area[r][c] == i) {
-                        sum += mapView[r][c];
-                    }
-                }
-            }
-            tmpMin = Math.min(tmpMin, sum);
-            tmpMax = Math.max(tmpMax, sum);
-        }
-
-        return Math.abs(tmpMax - tmpMin);
     }
 
     private static void generateFive(int r, int c, int d1, int d2) {
@@ -147,28 +128,32 @@ public class Main {
         for (int i = 1; i <= N; i++) {
             for (int j = 1; j <= N; j++) {
 
-                if (i >= 1 && i <= r + d1 && j >= 1 && j <= c) {
-                    if (area[i][j] != 5) {
-                        area[i][j] = 1;
-                    }
+                if (area[i][j] == 5) {
+                    peopleSum[4] += mapView[i][j];
+                    continue;
+                }
+
+                if (i >= 1 && i < r + d1 && j >= 1 && j <= c) {
+                    area[i][j] = 1;
+                    peopleSum[0] += mapView[i][j];
+                    continue;
                 }
 
                 if (i >= 1 && i <= r + d2 && j > c && j <= N) {
-                    if (area[i][j] != 5) {
-                        area[i][j] = 2;
-                    }
+                    area[i][j] = 2;
+                    peopleSum[1] += mapView[i][j];
+                    continue;
                 }
 
                 if (i >= r + d1 && i <= N && j >= 1 && j < c - d1 + d2) {
-                    if (area[i][j] != 5) {
-                        area[i][j] = 3;
-                    }
+                    area[i][j] = 3;
+                    peopleSum[2] += mapView[i][j];
+                    continue;
                 }
 
                 if (i > r + d2 && i <= N && j >= c - d1 + d2 && j <= N) {
-                    if (area[i][j] != 5) {
-                        area[i][j] = 4;
-                    }
+                    area[i][j] = 4;
+                    peopleSum[3] += mapView[i][j];
                 }
             }
         }
