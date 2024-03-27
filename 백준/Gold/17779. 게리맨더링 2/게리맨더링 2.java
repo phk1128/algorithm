@@ -51,6 +51,8 @@ public class Main {
                     peopleSum = new int[5];
                     generateFive(r, c, d1, d2);
                     generateAnother(r, c, d1, d2);
+                    sumFiveZone();
+
                     Arrays.sort(peopleSum);
                     min = Math.min(min, peopleSum[4] - peopleSum[0]);
                 }
@@ -64,83 +66,71 @@ public class Main {
         }
     }
 
+    private static void sumFiveZone() {
+
+        for (int r = 1; r <= N; r++) {
+            for (int c = 1; c <= N; c++) {
+                if (area[r][c] == 5 || area[r][c] == 0) {
+                    peopleSum[4] += mapView[r][c];
+                }
+            }
+        }
+    }
+
     private static void generateFive(int r, int c, int d1, int d2) {
 
         area[r][c] = 5;
 
         for (int i = 1; i <= d1; i++) {
             area[r + i][c - i] = 5;
+            area[r + d2 + i][c + d2 - i] = 5;
         }
 
         for (int i = 1; i <= d2; i++) {
             area[r + i][c + i] = 5;
-        }
-
-        for (int i = 1; i <= d2; i++) {
             area[r + d1 + i][c - d1 + i] = 5;
-        }
-
-        for (int i = 1; i <= d1; i++) {
-            area[r + d2 + i][c + d2 - i] = 5;
-        }
-
-        for (int i = 1; i <= N; i++) {
-            for (int j = 1; j <= N; j++) {
-                if (area[i][j] == 5) {
-                    int tmpC = j + 1;
-                    boolean flag = false;
-                    while (tmpC <= N) {
-                        if (area[i][tmpC] == 5) {
-                            flag = true;
-                            break;
-                        }
-                        tmpC++;
-                    }
-
-                    if (flag) {
-                        tmpC = j + 1;
-                        while (area[i][tmpC] != 5) {
-                            area[i][tmpC] = 5;
-                            tmpC++;
-                        }
-                    }
-                }
-            }
         }
     }
 
     private static void generateAnother(int r, int c, int d1, int d2) {
 
-        for (int i = 1; i <= N; i++) {
-            for (int j = 1; j <= N; j++) {
-
+        for (int i = 1; i < r + d1; i++) {
+            for (int j = 1; j <= c; j++) {
                 if (area[i][j] == 5) {
-                    peopleSum[4] += mapView[i][j];
-                    continue;
+                    break;
                 }
+                peopleSum[0] += mapView[i][j];
+                area[i][j] = 1;
+            }
+        }
 
-                if (i >= 1 && i < r + d1 && j >= 1 && j <= c) {
-                    area[i][j] = 1;
-                    peopleSum[0] += mapView[i][j];
-                    continue;
+        for (int i = 1; i <= r + d2; i++) {
+            for (int j = N; j > c; j--) {
+                if (area[i][j] == 5) {
+                    break;
                 }
+                peopleSum[1] += mapView[i][j];
+                area[i][j] = 2;
+            }
+        }
 
-                if (i >= 1 && i <= r + d2 && j > c && j <= N) {
-                    area[i][j] = 2;
-                    peopleSum[1] += mapView[i][j];
-                    continue;
+        for (int i = r + d1; i <= N; i++) {
+            for (int j = 1; j < c - d1 + d2; j++) {
+                if (area[i][j] == 5) {
+                    break;
                 }
+                peopleSum[2] += mapView[i][j];
+                area[i][j] = 3;
+            }
+        }
 
-                if (i >= r + d1 && i <= N && j >= 1 && j < c - d1 + d2) {
-                    area[i][j] = 3;
-                    peopleSum[2] += mapView[i][j];
-                    continue;
+        for (int i = N; i > r + d2; i--) {
+            for (int j = N; j >= c - d1 + d2; j--) {
+                if (area[i][j] == 5) {
+                    break;
                 }
-
-                if (i > r + d2 && i <= N && j >= c - d1 + d2 && j <= N) {
-                    area[i][j] = 4;
-                    peopleSum[3] += mapView[i][j];
-                }
+                peopleSum[3] += mapView[i][j];
+                area[i][j] = 4;
             }
         }
     }
