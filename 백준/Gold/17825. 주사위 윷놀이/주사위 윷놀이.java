@@ -53,7 +53,10 @@ public class Main {
         roots[3] = new int[]{0, 28, 27, 26, 25, 30, 35, 40}; // 30에 멈췄을때 사이즈 8
 
         solve(0, 0);
-        System.out.println(max);
+        
+        bw.write(String.valueOf(max));
+        bw.flush();
+        bw.close();
     }
 
     private static void solve(int depth, int score) {
