@@ -81,10 +81,6 @@ public class Main {
             this.d = d;
         }
 
-        public void setD(int d) {
-            this.d = d;
-        }
-
         public void setDirections(int[][] directions) {
             this.directions = directions;
         }
@@ -270,7 +266,7 @@ public class Main {
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < M; i++) {
             int d = Integer.parseInt(st.nextToken());
-            sharks.get(i).setD(d);
+            sharks.get(i).updateD(d);
         }
 
         for (Shark shark : sharks) {
