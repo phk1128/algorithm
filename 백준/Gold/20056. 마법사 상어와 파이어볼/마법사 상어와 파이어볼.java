@@ -83,6 +83,9 @@ public class Main {
         for (int r = 0; r < N; r++) {
             for (int c = 0; c < N; c++) {
                 int fireCount = mapView[r][c][2];
+                if (fireCount == 0) {
+                    continue;
+                }
                 int m = mapView[r][c][0];
                 int s = mapView[r][c][1];
                 if (fireCount >= 2) {
@@ -179,3 +182,4 @@ public class Main {
         }
     }
 }
+
