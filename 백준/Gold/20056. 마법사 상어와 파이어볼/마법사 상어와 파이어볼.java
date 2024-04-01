@@ -54,6 +54,7 @@ public class Main {
         solve();
 
         printAnswer();
+
     }
 
     private static void printAnswer() throws IOException {
@@ -148,7 +149,6 @@ public class Main {
         }
     }
 
-
     private static void init() throws IOException {
 
         br = new BufferedReader(new InputStreamReader(System.in));
@@ -179,4 +179,3 @@ public class Main {
         }
     }
 }
-
