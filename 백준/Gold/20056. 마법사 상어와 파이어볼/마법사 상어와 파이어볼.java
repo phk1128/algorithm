@@ -24,9 +24,9 @@ public class Main {
     private static int N;
     private static int M;
     private static int K;
-    private static int[][][][] mapView;
-    private static List<FireBall> fireBalls;
-    private static Set<FireBall> movedFireBalls;
+    private static int[][][] mapView;
+    private static Queue<FireBall> fireBalls;
+    private static Queue<Integer>[][] fireBallDirections;
     private static int[][] directions;
     private static int answer;
 
@@ -45,26 +45,6 @@ public class Main {
             this.s = s;
             this.d = d;
         }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof FireBall)) {
-                return false;
-            }
-
-            FireBall fireBall = (FireBall) o;
-            return Objects.equals(this.r, fireBall.r) &&
-                    Objects.equals(this.c, fireBall.c);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(r, c);
-        }
-
     }
 
     public static void main(String[] args) throws IOException {
@@ -74,8 +54,6 @@ public class Main {
         solve();
 
         printAnswer();
-
-
     }
 
     private static void printAnswer() throws IOException {
@@ -93,50 +71,60 @@ public class Main {
         }
         answer = 0;
 
-        for (FireBall fireBall : fireBalls) {
+        while (!fireBalls.isEmpty()) {
+            FireBall fireBall = fireBalls.poll();
             answer += fireBall.m;
         }
     }
 
     private static void divideFireBall() {
 
-        for (FireBall fireBall : movedFireBalls) {
-            int r = fireBall.r;
-            int c = fireBall.c;
-            int fireCount = mapView[r][c][0][2] + mapView[r][c][1][2];
-            if (fireCount == 0) {
-                continue;
-            }
-            if (fireCount >= 2) {
-                int newM = (mapView[r][c][0][0] + mapView[r][c][1][0]) / 5;
-                int newS = (mapView[r][c][0][1] + mapView[r][c][1][1]) / fireCount;
-
-                if (newM == 0) {
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < N; c++) {
+                int fireCount = mapView[r][c][2];
+                if (fireCount == 0) {
                     continue;
                 }
+                int m = mapView[r][c][0];
+                int s = mapView[r][c][1];
+                if (fireCount >= 2) {
+                    int newM = m / 5;
+                    int newS = s / fireCount;
 
-                if (mapView[r][c][0][2] == 0 || mapView[r][c][1][2] == 0) {
-                    for (int newD : new int[]{0, 2, 4, 6}) {
-                        fireBalls.add(new FireBall(r, c, newM, newS, newD));
+                    int flagNum = fireBallDirections[r][c].peek() % 2;
+                    boolean flag = true;
+                    while (!fireBallDirections[r][c].isEmpty()) {
+                        if (flagNum != fireBallDirections[r][c].poll() % 2) {
+                            flag = false;
+                        }
                     }
-                }
-                if (mapView[r][c][0][2] != 0 && mapView[r][c][1][2] != 0) {
-                    for (int newD : new int[]{1, 3, 5, 7}) {
-                        fireBalls.add(new FireBall(r, c, newM, newS, newD));
+
+                    if (newM == 0) {
+                        continue;
                     }
+
+                    if (flag) {
+                        for (int newD : new int[]{0, 2, 4, 6}) {
+                            fireBalls.offer(new FireBall(r, c, newM, newS, newD));
+                        }
+                    } else {
+                        for (int newD : new int[]{1, 3, 5, 7}) {
+                            fireBalls.offer(new FireBall(r, c, newM, newS, newD));
+                        }
+                    }
+                    continue;
                 }
-                continue;
+                fireBalls.offer(new FireBall(r, c, m, s, fireBallDirections[r][c].poll()));
             }
-            fireBalls.add(new FireBall(r, c, fireBall.m, fireBall.s, fireBall.d));
         }
     }
 
     private static void moveFireBall() {
 
-        mapView = new int[N][N][2][3];
-        movedFireBalls = new HashSet<>();
+        mapView = new int[N][N][3];
 
-        for (FireBall fireBall : fireBalls) {
+        while (!fireBalls.isEmpty()) {
+            FireBall fireBall = fireBalls.poll();
             int r = fireBall.r;
             int c = fireBall.c;
             int m = fireBall.m;
@@ -162,17 +150,14 @@ public class Main {
             }
 
             if (directions[d][1] > 0) {
-                for (int i = 0; i < s; i++) {
-                    c = (c + directions[d][1]) % N;
-                }
+                c = (c + directions[d][1] * s) % N;
             }
-            int idx = d % 2; // 홀수 짝수 판별
-            mapView[r][c][idx][0] += m;
-            mapView[r][c][idx][1] += s;
-            mapView[r][c][idx][2] += 1;
-            movedFireBalls.add(new FireBall(r, c, m, s, d));
+
+            mapView[r][c][0] += m;
+            mapView[r][c][1] += s;
+            mapView[r][c][2] += 1;
+            fireBallDirections[r][c].offer(d);
         }
-        fireBalls.clear();
     }
 
 
@@ -185,7 +170,13 @@ public class Main {
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
         K = Integer.parseInt(st.nextToken());
-        fireBalls = new ArrayList<>();
+        fireBalls = new ArrayDeque<>();
+        fireBallDirections = new ArrayDeque[N][N];
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < N; c++) {
+                fireBallDirections[r][c] = new ArrayDeque<>();
+            }
+        }
         directions = new int[][]{{-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}};
 
         for (int i = 0; i < M; i++) {
@@ -195,7 +186,7 @@ public class Main {
             int m = Integer.parseInt(st.nextToken());
             int s = Integer.parseInt(st.nextToken());
             int d = Integer.parseInt(st.nextToken());
-            fireBalls.add(new FireBall(r - 1, c - 1, m, s, d));
+            fireBalls.offer(new FireBall(r - 1, c - 1, m, s, d));
         }
     }
 }
