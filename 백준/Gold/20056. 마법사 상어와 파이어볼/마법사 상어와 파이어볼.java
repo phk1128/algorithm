@@ -112,15 +112,19 @@ public class Main {
                             fireBalls.offer(new FireBall(r, c, newM, newS, newD));
                         }
                     }
-                    continue;
+                } else {
+                    fireBalls.offer(new FireBall(r, c, m, s, fireBallDirections[r][c].poll()));
                 }
-                fireBalls.offer(new FireBall(r, c, m, s, fireBallDirections[r][c].poll()));
+                mapView[r][c][0] = 0;
+                mapView[r][c][1] = 0;
+                mapView[r][c][2] = 0;
+
             }
         }
     }
 
     private static void moveFireBall() {
-
+        
         mapView = new int[N][N][3];
 
         while (!fireBalls.isEmpty()) {
@@ -170,6 +174,7 @@ public class Main {
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
         K = Integer.parseInt(st.nextToken());
+        mapView = new int[N][N][3];
         fireBalls = new ArrayDeque<>();
         fireBallDirections = new ArrayDeque[N][N];
         for (int r = 0; r < N; r++) {
