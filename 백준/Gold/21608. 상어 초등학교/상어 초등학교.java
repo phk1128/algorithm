@@ -43,16 +43,16 @@ public class Main {
         @Override
         public int compareTo(Seat s) {
 
-            if (this.favorite == s.favorite) {
-                if (this.empty == s.empty) {
-                    if (this.r == s.r) {
-                        return this.c - s.c;
-                    }
-                    return this.r - s.r;
-                }
+            if (this.favorite != s.favorite) {
+                return s.favorite - this.favorite;
+            }
+            if (this.empty != s.empty) {
                 return s.empty - this.empty;
             }
-            return s.favorite - this.favorite;
+            if (this.r != s.r) {
+                return this.r - s.r;
+            }
+            return this.c - s.c;
         }
     }
 
