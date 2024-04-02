@@ -25,7 +25,6 @@ public class Main {
     private static int N;
     private static int M;
     private static int[][] mapView;
-    private static int[][] tmpMapView;
     private static boolean[][] visited;
     private static Queue<Cloud> clouds;
     private static Queue<Cloud> movedClouds;
@@ -119,7 +118,6 @@ public class Main {
         }
 
         increase();
-        mapView = arrCopyOf(tmpMapView);
         generateCloud();
     }
 
@@ -128,28 +126,15 @@ public class Main {
         for (int r = 0; r < N; r++) {
             for (int c = 0; c < N; c++) {
                 if (!visited[r][c] && mapView[r][c] >= 2) {
-                    int newWater = mapView[r][c] - 2;
-                    mapView[r][c] = newWater;
+                    mapView[r][c] -= 2;
                     clouds.offer(new Cloud(r, c));
                 }
             }
         }
     }
 
-    private static int[][] arrCopyOf(int[][] arr) {
-
-        int[][] tmpArr = new int[N][N];
-
-        for (int i = 0; i < N; i++) {
-            tmpArr[i] = Arrays.copyOf(arr[i], N);
-        }
-        return tmpArr;
-    }
-
 
     private static void increase() {
-
-        tmpMapView = arrCopyOf(mapView);
 
         while (!movedClouds.isEmpty()) {
             Cloud cloud = movedClouds.poll();
@@ -168,7 +153,7 @@ public class Main {
                     count++;
                 }
             }
-            tmpMapView[r][c] += count;
+            mapView[r][c] += count;
         }
     }
 }
