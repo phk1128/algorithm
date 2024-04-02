@@ -5,10 +5,10 @@
 // 5. 인접한 칸에 좋아하는 학생이 0 -> 1 / 1 -> 2 / 2 -> 10 / 3 -> 100 / 4 -> 1000
 // 만족도의 총 합을 구해보자
 
-// 자리 객체 만들기
+// Seat 객체 만들기
+// Seat 객체 compareTo 오버라이딩 1,2,3 조건에 맞게 구현
 // 입력을 받는 동시에 자리 배정하기
-// 자리 선택을 위한 비교 함수 만들기
-// 모든 자리를 배치 후 맵을 돌면서 주변에 좋아하는 학생이 몇명인지 체크하기
+// 모든 자리를 배치 후 맵을 돌면서 주변에 좋아하는 학생이 몇명인지 체크하면서 답 계산
 
 
 import java.util.*;
@@ -24,6 +24,7 @@ public class Main {
     private static int[][] mapView;
     private static int[][] directions;
     private static List<Seat> seats;
+    private static int[] score;
 
     static class Seat implements Comparable<Seat> {
 
@@ -66,7 +67,7 @@ public class Main {
         mapView = new int[N][N];
         students = new ArrayList[N * N + 1][1];
         directions = new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-        seats = new ArrayList<>();
+        score = new int[]{0, 1, 10, 100, 1000};
 
         for (int i = 0; i < N * N; i++) {
             st = new StringTokenizer(br.readLine());
@@ -103,9 +104,8 @@ public class Main {
                     }
 
                 }
-                if (favorite != 0) {
-                    answer += Math.pow(10, favorite - 1);
-                }
+
+                answer += score[favorite];
             }
         }
 
@@ -113,6 +113,8 @@ public class Main {
     }
 
     private static void solve(int number) {
+
+        seats = new ArrayList<>();
 
         for (int r = 0; r < N; r++) {
             for (int c = 0; c < N; c++) {
@@ -123,7 +125,6 @@ public class Main {
         }
         Collections.sort(seats);
         mapView[seats.get(0).r][seats.get(0).c] = number;
-        seats.clear();
     }
 
     private static void addSeat(int r, int c, int number) {
@@ -153,3 +154,5 @@ public class Main {
         seats.add(new Seat(r, c, favorite, empty));
     }
 }
+
+
