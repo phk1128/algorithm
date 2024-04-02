@@ -31,7 +31,7 @@ public class Main {
     private static Queue<Cloud> movedClouds;
     private static int[][] directions;
     private static int[][] commandD;
-    
+
     static class Cloud {
 
         int r;
@@ -129,9 +129,6 @@ public class Main {
             for (int c = 0; c < N; c++) {
                 if (!visited[r][c] && mapView[r][c] >= 2) {
                     int newWater = mapView[r][c] - 2;
-                    if (newWater < 0) {
-                        newWater = 0;
-                    }
                     mapView[r][c] = newWater;
                     clouds.offer(new Cloud(r, c));
                 }
