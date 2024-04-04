@@ -15,14 +15,6 @@
 
 * 상,좌,하,우 => 1,2,3,4 로 표현하고 이를 이어 붙여 정수를 만들고, 이를 오름차순으로 하는게 사전순이 된다.
 
-물고기 객체 -> mapView로 사용한다.
-상어 객체 -> 이동 마다 상어 객체를 만들어 저장한다.
-냄새 배열 -> 냄새를 카운팅한다.
-
-물고기 복제를 위해 기존 mapView를 저장해둬야한다
-상어 객체에 조건에 맞게 compareTo를 오버라이딩한다.
-재귀를 통해 갈 수 있는 모든 방향을 탐색한 뒤 3칸 이동이 완료 되면, 그 동안 먹은 물고기와 방향들을 저장한다.
-물고기를 복제후 기존 mapView를 copyMapView로 갱신한다.
 */
 
 import java.util.*;
@@ -30,44 +22,6 @@ import java.io.*;
 
 public class Main {
 
-    static class Shark implements Comparable<Shark> {
-
-        int r;
-        int c;
-        int count;
-        int directions;
-
-        public Shark(int r, int c, int count, int directions) {
-            this.r = r;
-            this.c = c;
-            this.count = count;
-            this.directions = directions;
-        }
-
-        @Override
-        public int compareTo(Shark s) {
-
-            if (this.count != s.count) {
-                return s.count - this.count;
-            }
-
-            return this.directions - s.directions;
-        }
-
-    }
-
-    static class Fish {
-
-        int r;
-        int c;
-        int d;
-
-        public Fish(int r, int c, int d) {
-            this.r = r;
-            this.c = c;
-            this.d = d;
-        }
-    }
 
     private static BufferedReader br;
     private static BufferedWriter bw;
@@ -77,11 +31,11 @@ public class Main {
     private static int N;
     private static int[][] fishDirections;
     private static int[][] sharkDirections;
-    private static List<Shark> sharks;
     private static int[] sharkDirectionLog;
-    private static int[][] mapView;
-    private static Queue<Fish>[][] movedFishes;
-    private static List<Fish> fishes;
+    private static int[] sharkRoute;
+    private static int[][][] mapView;
+    private static int[][][] copyMapView;
+    private static int maxCount;
     private static int[][] smells;
     private static int sharkR;
     private static int sharkC;
@@ -100,24 +54,15 @@ public class Main {
         sharkDirections = new int[][]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
         smells = new int[N + 1][N + 1];
         sharkDirectionLog = new int[3];
-
-        mapView = new int[N + 1][N + 1];
-        fishes = new ArrayList<>();
-        sharks = new ArrayList<>();
-        movedFishes = new ArrayDeque[N + 1][N + 1];
-        for (int r = 1; r <= N; r++) {
-            for (int c = 1; c <= N; c++) {
-                movedFishes[r][c] = new ArrayDeque<>();
-            }
-        }
+        mapView = new int[N + 1][N + 1][8];
 
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
             int r = Integer.parseInt(st.nextToken());
             int c = Integer.parseInt(st.nextToken());
             int d = Integer.parseInt(st.nextToken());
-            fishes.add(new Fish(r, c, d - 1));
-            mapView[r][c]++;
+            mapView[r][c][d - 1]++;
+
         }
 
         st = new StringTokenizer(br.readLine());
@@ -139,7 +84,9 @@ public class Main {
 
         for (int r = 1; r <= N; r++) {
             for (int c = 1; c <= N; c++) {
-                answer += mapView[r][c];
+                for (int d = 0; d < 8; d++) {
+                    answer += mapView[r][c][d];
+                }
             }
         }
 
@@ -148,41 +95,25 @@ public class Main {
 
     private static void solve() {
 
-        moveFish();
+        moveFishes();
 
-        moveShark(sharkR, sharkC, 0, 0);
-
-        update();
+        moveShark();
 
         reduceSmell();
 
         copyFish();
 
-        addFish();
     }
 
-    private static void addFish() {
-
-        fishes.clear();
-        for (int r = 1; r <= N; r++) {
-            for (int c = 1; c <= N; c++) {
-                Queue<Fish> fishQueue = movedFishes[r][c];
-                while (!fishQueue.isEmpty()) {
-                    Fish fish = fishQueue.poll();
-                    fishes.add(new Fish(fish.r, fish.c, fish.d));
-                }
-            }
-        }
-    }
 
     private static void copyFish() {
 
-        for (Fish fish : fishes) {
-            int r = fish.r;
-            int c = fish.c;
-            int d = fish.d;
-            mapView[r][c]++;
-            movedFishes[r][c].offer(new Fish(r, c, d));
+        for (int r = 1; r <= N; r++) {
+            for (int c = 1; c <= N; c++) {
+                for (int d = 0; d < 8; d++) {
+                    mapView[r][c][d] += copyMapView[r][c][d];
+                }
+            }
         }
     }
 
@@ -199,48 +130,32 @@ public class Main {
         }
     }
 
-    private static void update() {
+    private static void moveShark() {
 
-        Collections.sort(sharks);
-        Shark shark = sharks.get(0);
-        int directions = shark.directions;
-        String[] strD = String.valueOf(directions).split("");
-        int newR = sharkR;
-        int newC = sharkC;
-        for (String s : strD) {
-            int d = Integer.parseInt(s);
-            newR += sharkDirections[d - 1][0];
-            newC += sharkDirections[d - 1][1];
+        maxCount = Integer.MIN_VALUE;
+        sharkRoute = new int[3];
+        searchSharkRoute(sharkR, sharkC, 0, 0);
 
-            if (mapView[newR][newC] == 0) {
-                continue;
+        for (int sr : sharkRoute) {
+            sharkR += sharkDirections[sr][0];
+            sharkC += sharkDirections[sr][1];
+
+            for (int i = 0; i < 8; i++) {
+                if (copyMapView[sharkR][sharkC][i] > 0) {
+                    copyMapView[sharkR][sharkC][i] = 0;
+                    smells[sharkR][sharkC] = 3;
+                }
             }
-
-            movedFishes[newR][newC].clear();
-            mapView[newR][newC] = 0;
-            smells[newR][newC] = 3;
-
         }
-
-        sharkR = shark.r;
-        sharkC = shark.c;
-        sharks.clear();
     }
 
-    private static void moveShark(int sharkR, int sharkC, int count, int depth) {
+    private static void searchSharkRoute(int sharkR, int sharkC, int count, int depth) {
 
         if (depth == 3) {
-
-            String numStr = "";
-
-            for (int num : sharkDirectionLog) {
-                numStr += num;
+            if (maxCount < count) {
+                maxCount = count;
+                sharkRoute = Arrays.copyOf(sharkDirectionLog, 3);
             }
-
-            int directions = Integer.parseInt(numStr);
-
-            sharks.add(new Shark(sharkR, sharkC, count, directions));
-
             return;
         }
 
@@ -252,45 +167,58 @@ public class Main {
             if (!(newR >= 1 && newR <= N && newC >= 1 && newC <= N)) {
                 continue;
             }
-            int fishCount = mapView[newR][newC];
-            mapView[newR][newC] = 0;
-            sharkDirectionLog[depth] = i + 1;
-            int newCount = count + fishCount;
-            moveShark(newR, newC, newCount, depth + 1);
-            mapView[newR][newC] = fishCount;
+
+            int[] tmpArr = Arrays.copyOf(copyMapView[newR][newC], 8);
+
+            int newCount = count;
+            for (int j = 0; j < 8; j++) {
+                newCount += copyMapView[newR][newC][j];
+                copyMapView[newR][newC][j] = 0;
+            }
+            sharkDirectionLog[depth] = i;
+            searchSharkRoute(newR, newC, newCount, depth + 1);
+            copyMapView[newR][newC] = tmpArr;
         }
     }
 
-    private static void moveFish() {
+    private static void moveFishes() {
 
-        for (Fish fish : fishes) {
-            int r = fish.r;
-            int c = fish.c;
-            int d = fish.d;
-            boolean flag = false;
+        copyMapView = new int[N + 1][N + 1][8];
 
-            for (int i = 0; i < 8; i++) {
-
-                int newR = r + fishDirections[d][0];
-                int newC = c + fishDirections[d][1];
-
-                if (newR >= 1 && newR <= N && newC >= 1 && newC <= N) {
-                    if (!(newR == sharkR && newC == sharkC)) {
-                        if (smells[newR][newC] == 0) {
-                            movedFishes[newR][newC].offer(new Fish(newR, newC, d));
-                            mapView[newR][newC]++;
-                            mapView[r][c]--;
-                            flag = true;
-                            break;
-                        }
+        for (int r = 1; r <= N; r++) {
+            for (int c = 1; c <= N; c++) {
+                for (int d = 0; d < 8; d++) {
+                    if (mapView[r][c][d] > 0) {
+                        moveFish(r, c, d);
                     }
                 }
-                d = (8 + (d - 1)) % 8;
             }
+        }
+    }
 
-            if (!flag) {
-                movedFishes[fish.r][fish.c].offer(new Fish(fish.r, fish.c, fish.d));
+    private static void moveFish(int r, int c, int d) {
+
+        int newD = d;
+        boolean flag = false;
+        for (int i = 0; i < 8; i++) {
+
+            int newR = r + fishDirections[newD][0];
+            int newC = c + fishDirections[newD][1];
+
+            if (newR >= 1 && newR <= N && newC >= 1 && newC <= N) {
+                if (newR != sharkR || newC != sharkC) {
+                    if (smells[newR][newC] == 0) {
+                        copyMapView[newR][newC][newD] += mapView[r][c][d];
+                        flag = true;
+                        break;
+                    }
+                }
             }
+            newD = (8 + (newD - 1)) % 8;
+        }
+
+        if (!flag) {
+            copyMapView[r][c][d] += mapView[r][c][d];
         }
     }
 }
