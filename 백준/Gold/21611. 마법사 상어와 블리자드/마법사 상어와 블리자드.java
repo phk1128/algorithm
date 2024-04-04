@@ -33,6 +33,7 @@ public class Main {
     private static Queue<Integer>[] marblesPosition;
     private static int[] bomb;
     private static int[][] rotateD;
+    private static boolean bombFlag;
 
 
     public static void main(String[] args) throws IOException {
@@ -67,6 +68,7 @@ public class Main {
             int s = Integer.parseInt(st.nextToken());
             marblesGroup = new ArrayDeque<>();
             marblesPosition = new ArrayDeque[4];
+            bombFlag = true;
 
             for (int j = 0; j <= 3; j++) {
                 marblesPosition[j] = new ArrayDeque<>();
@@ -75,11 +77,11 @@ public class Main {
             blizzard(d, s);
             rotateShift();
 
-            for (int j = 0; j < N; j++) {
+            while (bombFlag) {
                 rotateBomb();
                 rotateShift();
-
             }
+
             generateMarblesGroup();
             marblesUpdate();
         }
@@ -211,6 +213,7 @@ public class Main {
     }
 
     private static void rotateBomb() {
+        bombFlag = false;
         int number = 0;
         for (int i = 1; i < limitN; i++) {
 
@@ -224,7 +227,7 @@ public class Main {
                 number = tmpNum;
             }
             if (tmpNum == 0) {
-                return;
+                break;
             }
         }
     }
@@ -240,6 +243,7 @@ public class Main {
                 mapView[r][c] = 0;
                 bomb[num]++;
             }
+            bombFlag = true;
         } else {
             positions.clear();
         }
