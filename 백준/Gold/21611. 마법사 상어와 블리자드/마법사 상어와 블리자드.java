@@ -83,9 +83,7 @@ public class Main {
                 rotateBomb();
                 rotateShift();
             }
-
             generateMarblesGroup();
-            marblesUpdate();
         }
 
         bw.write(String.valueOf(getAnswer()));
@@ -103,19 +101,10 @@ public class Main {
         return answer;
     }
 
-    private static void marblesUpdate() {
-
-        int start = 1;
-        while (start < powN) {
-            if (marblesGroup.isEmpty()) {
-                break;
-            }
-            snail[start] = marblesGroup.poll();
-            start++;
-        }
-    }
-
     private static void generateMarblesGroup() {
+
+        int[] tmp = new int[powN];
+        int idx = 1;
 
         for (int i = 1; i < powN; i++) {
 
@@ -123,7 +112,7 @@ public class Main {
             int count = 1;
 
             if (number == 0) {
-                return;
+                break;
             }
 
             while (true) {
@@ -134,10 +123,15 @@ public class Main {
                     break;
                 }
             }
-            marblesGroup.offer(count);
-            marblesGroup.offer(number);
+            tmp[idx++] = count;
+            tmp[idx++] = number;
+            if (idx == powN) {
+                break;
+            }
             i += (count - 1);
         }
+
+        snail = tmp;
     }
 
     private static void blizzard(int d, int s) {
