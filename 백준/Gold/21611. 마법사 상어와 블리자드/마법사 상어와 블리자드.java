@@ -11,7 +11,7 @@
 // 가운데에서 회전하며 맵을 조회하는 로직 필요
 // 구슬 폭파 로직 필요
 // 가운데부터 맵을 회전하며 구슬을 그룹화 시키고 이를 바로 A,B로 나누어 큐에 담는다.
-// 구슬을 하나씩 추가하며 방문 배열에 방문처리한다.
+
 
 import java.util.*;
 import java.io.*;
@@ -23,14 +23,15 @@ public class Main {
     private static StringTokenizer st;
     private static int N;
     private static int M;
-    private static int limitN;
+    private static int powN;
     private static int[][] mapView;
     private static int[][] rotateMapView;
+    private static int[] snail;
     private static int[][] blizzardD;
     private static int sharkR;
     private static int sharkD;
     private static Queue<Integer> marblesGroup;
-    private static Queue<Integer>[] marblesPosition;
+    private static Queue<Integer>[] marblesBomb;
     private static int[] bomb;
     private static int[][] rotateD;
     private static boolean bombFlag;
@@ -44,15 +45,21 @@ public class Main {
 
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
+        powN = N * N;
         bomb = new int[4];
         rotateD = new int[][]{{0, -1}, {1, 0}};
-        rotateMapView = new int[N * N][2];
-        limitN = N * N;
+        rotateMapView = new int[N + 1][N + 1];
+        snail = new int[powN];
         blizzardD = new int[][]{{0, 0}, {-1, 0}, {1, 0}, {0, -1}, {0, 1}};
         sharkR = (N + 1) / 2;
         sharkD = (N + 1) / 2;
         mapView = new int[N + 1][N + 1];
         rotateMapView[0] = new int[]{sharkR, sharkD};
+        marblesBomb = new ArrayDeque[4];
+
+        for (int i = 0; i < 4; i++) {
+            marblesBomb[i] = new ArrayDeque<>();
+        }
 
         for (int r = 1; r <= N; r++) {
             st = new StringTokenizer(br.readLine());
@@ -67,12 +74,7 @@ public class Main {
             int d = Integer.parseInt(st.nextToken());
             int s = Integer.parseInt(st.nextToken());
             marblesGroup = new ArrayDeque<>();
-            marblesPosition = new ArrayDeque[4];
             bombFlag = true;
-
-            for (int j = 0; j <= 3; j++) {
-                marblesPosition[j] = new ArrayDeque<>();
-            }
 
             blizzard(d, s);
             rotateShift();
@@ -104,24 +106,20 @@ public class Main {
     private static void marblesUpdate() {
 
         int start = 1;
-        while (start <= limitN - 1) {
-            int r = rotateMapView[start][0];
-            int c = rotateMapView[start][1];
+        while (start < powN) {
             if (marblesGroup.isEmpty()) {
                 break;
             }
-            mapView[r][c] = marblesGroup.poll();
+            snail[start] = marblesGroup.poll();
             start++;
         }
     }
 
     private static void generateMarblesGroup() {
 
-        for (int i = 1; i < limitN - 1; i++) {
+        for (int i = 1; i < powN; i++) {
 
-            int r = rotateMapView[i][0];
-            int c = rotateMapView[i][1];
-            int number = mapView[r][c];
+            int number = snail[i];
             int count = 1;
 
             if (number == 0) {
@@ -129,11 +127,7 @@ public class Main {
             }
 
             while (true) {
-
-                int tmpR = rotateMapView[i + count][0];
-                int tmpC = rotateMapView[i + count][1];
-                int tmpNum = mapView[tmpR][tmpC];
-
+                int tmpNum = snail[i + count];
                 if (number == tmpNum) {
                     count++;
                 } else {
@@ -157,7 +151,8 @@ public class Main {
             if (!(r >= 1 && r <= N && c >= 1 && c <= N)) {
                 return;
             }
-            mapView[r][c] = 0;
+            int num = rotateMapView[r][c];
+            snail[num] = 0;
         }
 
     }
@@ -172,8 +167,8 @@ public class Main {
                 if (!(r >= 1 && r <= N && c >= 1 && c <= N)) {
                     return;
                 }
-
-                rotateMapView[num] = new int[]{r, c};
+                snail[num] = mapView[r][c];
+                rotateMapView[r][c] = num;
                 num++;
             }
         }
@@ -183,45 +178,27 @@ public class Main {
 
     private static void rotateShift() {
 
-        for (int i = 2; i < limitN; i++) {
-            int r = rotateMapView[i][0];
-            int c = rotateMapView[i][1];
-            int number = mapView[r][c];
-            int count = 0;
-            if (number == 0) {
+        // 앞으로 당기기
+        int start = 1;
+        for (int i = 1; i < powN; i++) {
+            if (snail[i] == 0) {
                 continue;
             }
+            snail[start++] = snail[i];
+        }
 
-            int tmpIdx = i - 1;
-
-            while (true) {
-                int tmpR = rotateMapView[tmpIdx][0];
-                int tmpC = rotateMapView[tmpIdx][1];
-                int tmpNumber = mapView[tmpR][tmpC];
-                if (tmpNumber == 0 && tmpIdx != 0) {
-                    tmpIdx--;
-                    count++;
-                } else {
-                    tmpR = rotateMapView[i - count][0];
-                    tmpC = rotateMapView[i - count][1];
-                    mapView[r][c] = 0;
-                    mapView[tmpR][tmpC] = number;
-                    break;
-                }
-            }
+        // 앞으로 당겨진 얘들 0으로 초기화
+        for (int i = start; i < powN; i++) {
+            snail[i] = 0;
         }
     }
 
     private static void rotateBomb() {
         bombFlag = false;
         int number = 0;
-        for (int i = 1; i < limitN; i++) {
-
-            int r = rotateMapView[i][0];
-            int c = rotateMapView[i][1];
-            int tmpNum = mapView[r][c];
-
-            marblesPosition[tmpNum].offer(i);
+        for (int i = 1; i < powN; i++) {
+            int tmpNum = snail[i];
+            marblesBomb[tmpNum].offer(i);
             if (tmpNum != number) {
                 bombMarbles(number);
                 number = tmpNum;
@@ -234,21 +211,16 @@ public class Main {
 
     private static void bombMarbles(int num) {
 
-        Queue<Integer> positions = marblesPosition[num];
-        if (positions.size() >= 4) {
-            while (!positions.isEmpty()) {
-                int position = positions.poll();
-                int r = rotateMapView[position][0];
-                int c = rotateMapView[position][1];
-                mapView[r][c] = 0;
+        Queue<Integer> marbles = marblesBomb[num];
+        if (marbles.size() >= 4) {
+            while (!marbles.isEmpty()) {
+                int n = marbles.poll();
+                snail[n] = 0;
                 bomb[num]++;
             }
             bombFlag = true;
         } else {
-            positions.clear();
+            marbles.clear();
         }
     }
 }
-
-
-
