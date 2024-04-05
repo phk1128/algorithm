@@ -30,7 +30,6 @@ public class Main {
     private static int[][] blizzardD;
     private static int sharkR;
     private static int sharkD;
-    private static Queue<Integer> marblesGroup;
     private static Queue<Integer>[] marblesBomb;
     private static int[] bomb;
     private static int[][] rotateD;
@@ -73,7 +72,6 @@ public class Main {
             st = new StringTokenizer(br.readLine());
             int d = Integer.parseInt(st.nextToken());
             int s = Integer.parseInt(st.nextToken());
-            marblesGroup = new ArrayDeque<>();
             bombFlag = true;
 
             blizzard(d, s);
