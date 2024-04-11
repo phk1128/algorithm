@@ -9,14 +9,8 @@ class Solution {
         
         int idx = 0;
         for (int i = 1; i <= order.length; i++) {
-            boolean flag = false;
             
-            if (order[idx] == i) {
-                answer++;
-                idx++;
-                flag = true;
-            }
-            
+            stack.push(i);
             
             while (!stack.isEmpty() && idx < order.length) {
                 if (stack.peek() == order[idx]) {
@@ -26,10 +20,6 @@ class Solution {
                 } else {
                     break;
                 }
-            }
-            
-            if (!flag) {
-                stack.push(i);
             }
         }
         
