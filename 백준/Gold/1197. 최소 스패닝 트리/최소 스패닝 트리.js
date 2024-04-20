@@ -6,99 +6,92 @@ const [V, E] = inputs.shift().split(" ").map(Number);
 let graph = Array.from({length : V + 1}, () => new Array());
 const visited = new Array(V + 1).fill(false);
 
-
 class Edge {
 
     constructor(node, weight) {
-
         this.node = node;
         this.weight = weight;
     }
+
 }
 
 class PriorityQueue {
+
     constructor() {
-        this.heap = [];
+        this.queue = [0];
     }
 
     compare(e1, e2) {
         return e1.weight - e2.weight;
     }
 
-    swap(a, b) {
-        [this.heap[a], this.heap[b]] = [this.heap[b], this.heap[a]];
+    isEmpty() {
+        return this.queue.length <= 1;
     }
 
     offer(edge) {
-        this.heap.push(edge);
-        this.bubbleUp();
+
+        let idx = this.queue.length;
+
+        while(idx > 1 && this.compare(edge, this.queue[Math.floor(idx / 2)]) <= 0) {
+            this.queue[idx]  = this.queue[Math.floor(idx / 2)];
+            idx = Math.floor(idx / 2);
+        }
+
+        this.queue[idx] = edge;
+
     }
 
     poll() {
-        if (this.isEmpty()) {
-            return 0;
+        if (this.queue.length <= 1) {
+            throw new Error("NoSuchElementException");
         }
 
-        if (this.heap.length === 1) {
-            return this.heap.pop();
+        let first = this.queue[1];
+        let last = this.queue.pop();
+        let size = this.queue.length - 1;
+
+        if (size === 0) {
+            return first;
         }
 
-        let minValue = this.heap[0];
-        this.heap[0] = this.heap.pop();
-        this.bubbleDown();
-        return minValue;
-    }
+        let pIdx = 1;
+        let cIdx = 2;
 
-    bubbleUp() {
-        let index = this.heap.length - 1;
+        while (cIdx <= size) {
 
-        while (index > 0) {
-            let parentIdx = Math.floor((index - 1) / 2);
+            if (this.queue[cIdx + 1] !== undefined && this.compare(this.queue[cIdx], this.queue[cIdx + 1]) > 0) {
+                cIdx++;
+            }
 
-            if (this.compare(this.heap[parentIdx] , this.heap[index]) > 0) {
-                this.swap(index, parentIdx);
-                index = parentIdx;
-            } else {
+            if (this.compare(last, this.queue[cIdx]) <= 0) {
                 break;
             }
+
+            this.queue[pIdx] = this.queue[cIdx];
+
+            pIdx = cIdx;
+            cIdx *= 2;
         }
+
+
+        this.queue[pIdx] = last;
+
+        return first;
     }
 
-    bubbleDown() {
-        let index = 0;
-
-        while (true) {
-            let leftIdx = index * 2 + 1;
-            let rightIdx = index * 2 + 2;
-            let smallerIdx = index;
-
-            if (
-                leftIdx < this.heap.length &&
-                this.compare(this.heap[leftIdx], this.heap[smallerIdx]) < 0
-            ) {
-                smallerIdx = leftIdx;
-            }
-
-            if (
-                rightIdx < this.heap.length &&
-                this.compare(this.heap[rightIdx], this.heap[smallerIdx]) < 0
-            ) {
-                smallerIdx = rightIdx;
-            }
-
-            if (smallerIdx !== index) {
-                this.swap(index, smallerIdx);
-
-                index = smallerIdx;
-            } else {
-                break;
-            }
-        }
+    peek() {
+        return this.queue[1];
     }
 
-    isEmpty() {
-        return this.heap.length === 0;
+    size() {
+        return this.queue.length - 1;
     }
+
+    clear() {
+        this.queue = [0];
+    }
+
 }
 
 for (let input of inputs) {
