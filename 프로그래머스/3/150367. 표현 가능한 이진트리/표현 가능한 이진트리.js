@@ -31,9 +31,7 @@ function solution(numbers) {
         let root = Math.floor(binaryStr.length / 2);
         
         let result = 1;
-        global.flag = true;
-        checkPerfectBinaryTree(root, binaryStr, height - 1);
-        if (!global.flag) {
+        if (!isPerfectBinaryTree(root, binaryStr, height - 1)) {
             result = 0;
         }
         answer.push(result);
@@ -42,10 +40,10 @@ function solution(numbers) {
     return answer;
 }
 
-function checkPerfectBinaryTree(idx, binaryStr, height) {
+function isPerfectBinaryTree(idx, binaryStr, height) {
     
     if (height === 0) {
-        return;
+        return true;
     }
     
     let diff = Math.pow(2, height - 1);
@@ -54,12 +52,12 @@ function checkPerfectBinaryTree(idx, binaryStr, height) {
     
     if (binaryStr[idx] === "0") {
         if (binaryStr[left] === "1" || binaryStr[right] === "1") {
-           global.flag  = false;
+           return false;
         }
     }
     
-    checkPerfectBinaryTree(left, binaryStr, height - 1);
-    checkPerfectBinaryTree(right, binaryStr, height - 1);
+    return isPerfectBinaryTree(left, binaryStr, height - 1) && isPerfectBinaryTree(right, binaryStr, height - 1);
+    
     
 }
 
