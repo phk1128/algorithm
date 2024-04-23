@@ -1,100 +1,31 @@
 import java.util.*;
-import java.util.stream.*;
 
 class Solution {
-    private List<Root> roots;
     private List<String> result;
+    private boolean[] visited;
     
     public String[] solution(String[][] tickets) {
-        String[] answer = {};
-        roots = new ArrayList<Root>();
         result = new ArrayList<>();
-        
-        for (String[] ticket : tickets) {
-            Root tempRoot = new Root(ticket[0]);
-            if (!roots.contains(tempRoot)) {
-                roots.add(tempRoot);
-            }
-            Root root = roots.stream()
-                .filter(r -> Objects.equals(r,tempRoot))
-                .findAny()
-                .orElse(null);
-            
-            root.addDestination(ticket[1]);
-        }
-        
-        dfs("ICN");
-        
-        Collections.reverse(result);
-        
-        answer = result.toArray(new String[0]);
-        
+        visited = new boolean[tickets.length];
+        String[] answer = {};
+        dfs("ICN", "ICN", tickets, 0);
+        Collections.sort(result);
+        answer = result.get(0).split(",");
         return answer;
     }
     
-    private void dfs(String start) {
-        Root root = findByRoot(start);
-        if (!Objects.equals(root, null)) {
-            PriorityQueue<String> destinations = root.getDestinations();
-            while (!root.isEmpty()) {
-                dfs(destinations.poll());
+    private void dfs(String start, String root, String[][] tickets, int depth) {
+        if (depth == tickets.length) {
+            result.add(root);
+            return;
+        }
+        
+        for (int i = 0; i < tickets.length; i++) {
+            if (Objects.equals(start,tickets[i][0]) && !visited[i]) {
+                visited[i] = true;
+                dfs(tickets[i][1], root + "," + tickets[i][1], tickets, depth + 1);
+                visited[i] = false;
             }
-            result.add(start);
-        } else {
-            result.add(start);
         }
-    }
-    
-    
-    public Root findByRoot(String start) {
-        return roots.stream()
-                .filter(r -> Objects.equals(r,new Root(start)))
-                .findAny()
-                .orElse(null);
-    }
-    
-    static class Root {
-        
-        private String start;
-        private PriorityQueue<String> destinations = new PriorityQueue<>();
-        
-        public Root(String start) {
-            this.start = start;
-        }
-        
-        public String getStart() {
-            return this.start;
-        }
-        
-        public boolean isEmpty() {
-            return destinations.isEmpty();
-        }
-        
-        public PriorityQueue<String> getDestinations() {
-            return this.destinations;
-        }
-        
-        public void addDestination(String destination) {
-            this.destinations.offer(destination);
-        }
-        
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof Root)) {
-                return false;
-            }
-            
-            Root root = (Root) o;
-            return Objects.equals(this.start, root.start);
-        }
-        
-        @Override
-        public int hashCode() {
-            return Objects.hash(start);
-        }
-        
     }
 }
