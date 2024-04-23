@@ -1,6 +1,5 @@
 function solution(numbers) {
     var answer = [];
-    let flag;
     
     for (let number of numbers) {
         
