@@ -4,7 +4,7 @@ let visited;
 
 function solution(m, n, board) {
     var answer = 0;
-    let splitBoard = Array.from({length : m}, () => []);
+    let splitBoard = Array.from(new Array(m), () => []);
     for (let r = 0; r < m; r++) {
         splitBoard[r] = board[r].split("");
     }
