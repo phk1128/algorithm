@@ -12,7 +12,7 @@ class Solution {
             return -1;
         }
         
-        int limit = (int) Math.pow(10, 8);
+        int limit = queue1.length * 4;
         long number = total / 2;
         Queue<Long> q1 = new ArrayDeque<>();
         Queue<Long> q2 = new ArrayDeque<>();
