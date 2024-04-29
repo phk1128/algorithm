@@ -3,7 +3,6 @@ import java.util.*;
 class Solution {
     
     private static int[] count;
-    private static int[][] nextArr;
     private static int[][] directions;
     
     public int[] solution(int[][] arr) {
