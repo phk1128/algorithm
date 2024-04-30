@@ -7,10 +7,12 @@ class Solution {
         
         StringBuilder sb = new StringBuilder();
         while (n > 0) {
-            int q = n / 3;
             int r = n % 3;
             sb.append(arr[r]);
-            n = (n-1) / 3;
+            n /= 3;
+            if (r == 0) {
+                n--; 
+            }
         }
         
         answer = sb.reverse().toString();
