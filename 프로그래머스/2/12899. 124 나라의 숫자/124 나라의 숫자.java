@@ -10,10 +10,7 @@ class Solution {
             int q = n / 3;
             int r = n % 3;
             sb.append(arr[r]);
-            n /= 3;
-            if (r == 0) {
-                n--;
-            }
+            n = (n-1) / 3;
         }
         
         answer = sb.reverse().toString();
