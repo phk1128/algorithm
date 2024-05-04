@@ -1,42 +1,26 @@
+import java.util.*;
+
 class Solution {
-    
-    private int answer;
-    
     public int solution(int[] stones, int k) {
-        answer = 0;
-        binarySearch(0, 200_000_000, stones, k);
-        return answer;
-    }
-    
-    private void binarySearch(int start, int end, int[] stones, int k) {
+        int answer = Integer.MAX_VALUE;
         
-        if (start >= end) {
-            return;
-        }
+        Deque<Integer> queue = new ArrayDeque<>();
         
-        int mid = (start + end) / 2;
-        boolean flag = true;
-        int count = 0;
-        for (int stone : stones) {
-            if (stone - mid < 0) {
-                count++;
-            } else {
-                count = 0;
+        for (int i = 0; i < stones.length; i++) {
+            
+            while (!queue.isEmpty() && queue.peekFirst() <= i - k) {
+                queue.pollFirst();
             }
             
-            if (count >= k) {
-                flag = false;
-                break;
+            while (!queue.isEmpty() && stones[queue.peekLast()] < stones[i]) {
+                queue.pollLast();
+            }
+            queue.offer(i);
+            
+            if (i >= k - 1) {
+                answer = Math.min(answer, stones[queue.peekFirst()]);
             }
         }
-        
-        if (flag) {
-            answer = Math.max(answer, mid);
-            binarySearch(mid+1, end, stones, k);
-        } else {
-            binarySearch(start, mid, stones, k);
-        }
-        
-        
+        return answer;
     }
 }
