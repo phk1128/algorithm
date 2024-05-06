@@ -26,6 +26,9 @@ class Solution {
         numStack.push(nums[0]);
         
         for (int i = 1; i < nums.length; i++) {
+            // opStack에 담겨 있는 우선순위가 현재 op(ops[i - 1])보다 먼저라면 (숫자가 낮다면) 계산한다.
+            // 만약 우선순위가 현재 op(ops[i - 1]) 이 더 높다면 연산을 수행하지 않는다.
+            // 이를 통해서 자연스레 앞쪽은 우선순위가 낮은 것들 뒤쪽은 우선순위가 높은것들이 남는다.
             while (!opStack.isEmpty() && getPriority(ops[i-1],c) >= getPriority(opStack.peek(),c)) {
                 long a = numStack.pop();
                 long b = numStack.pop();
@@ -36,6 +39,7 @@ class Solution {
             opStack.push(ops[i-1]);
         }
         
+        // 우선순위가 높은것들은 위 로직에 의해 뒤쪽에 있기 때문에 뒤쪽부터 차례대로 계산하면된다.
         while (!opStack.isEmpty()) {
             long a = numStack.pop();
             long b = numStack.pop();
