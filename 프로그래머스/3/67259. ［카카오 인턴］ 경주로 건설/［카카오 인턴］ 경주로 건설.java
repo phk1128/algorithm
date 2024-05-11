@@ -1,90 +1,72 @@
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Queue;
 
 class Solution {
-    private int minCost;
-    private int N;
-    private List<Position> result;
-    
-    static class Position implements Comparable<Position> {
-        
-        int r;
-        int c;
-        int[] direction;
-        int cost;
-        
-        public Position(int r, int c, int[] direction, int cost) {
-            this.r = r;
-            this.c = c;
-            this.direction = direction;
-            this.cost = cost;
-        }
-        
-        @Override
-        public int compareTo(Position p) {
-            return this.cost - p.cost;
-        }
-    }
-    
+    static int length;
+    static boolean[][][] visited;
+    static int[] dy = {0, 1, 0, -1};
+    static int[] dx = {1, 0, -1, 0};
+
     public int solution(int[][] board) {
-        int answer = 0;
-        N = board.length;
-        minCost = Integer.MAX_VALUE;
-        result = new ArrayList<>();
-        updateMinCost(board);    
-        answer = minCost;
-        return answer;
+        length = board.length;
+        visited = new boolean[length][length][4];
+        return bfs(board);
     }
-    
-    private void updateMinCost(int[][] board) {
-        int[][] costs = new int[N][N];
-        int[][] directions = new int[][]{{1,0}, {-1,0}, {0,-1}, {0,1}};
-        Queue<Position> queue = new ArrayDeque<>();
-        queue.offer(new Position(0,0, new int[]{1,0}, 0));
-        queue.offer(new Position(0,0, new int[]{0,1}, 0));
-        
-        while (!queue.isEmpty()) {
-            Position position = queue.poll();
-            int r = position.r;
-            int c = position.c;
-            int[] currentD = position.direction;
-            int currentCost = position.cost;
-            
-            if (r == N - 1 && c == N - 1) {
-                minCost = Math.min(minCost, currentCost);
+
+    private int bfs(int[][] board) {
+        Queue<Node> q = new LinkedList<>();
+        q.offer(new Node(0, 0, -1, 0));
+        int min = Integer.MAX_VALUE;
+
+        while (!q.isEmpty()) {
+            Node now = q.poll();
+
+            if (now.y == length - 1 && now.x == length - 1) {
+                min = Math.min(min, now.cost);
                 continue;
             }
-            
-            for (int[] direction : directions) {
-                int newR = r + direction[0];
-                int newC = c + direction[1];
-                
-                if (!(newR >= 0 && newR < N && newC >= 0 && newC < N)){
+
+            for (int dir = 0; dir < 4; dir++) {
+                int moveY = now.y + dy[dir];
+                int moveX = now.x + dx[dir];
+
+                if (validation(board, moveY, moveX)) {
                     continue;
                 }
-                
-                if (board[newR][newC] == 1) {
-                    continue;
+
+                int nextCost = now.cost;
+
+                if (dir == now.dir || now.dir == -1) {
+                    nextCost += 100;
+                } else {
+                    nextCost += 600;
                 }
-                
-                int newCost = currentCost +getCost(currentD, direction);
-                if (costs[newR][newC] == 0) {
-                    costs[newR][newC] = newCost;
-                    queue.offer(new Position(newR, newC, direction, costs[newR][newC]));
-                }
-                
-                if (costs[newR][newC] + 500 > newCost) {
-                    costs[newR][newC] = newCost;
-                    queue.offer(new Position(newR, newC, direction, costs[newR][newC]));
+
+                if (!visited[moveY][moveX][dir] || board[moveY][moveX] >= nextCost) {
+                    q.offer(new Node(moveY, moveX, dir, nextCost));
+                    visited[moveY][moveX][dir] = true;
+                    board[moveY][moveX] = nextCost;
                 }
             }
         }
+        return min;
     }
-    
-    private int getCost(int[] currentD, int[] nextD) {
-        
-        if (currentD[0] != nextD[0] || currentD[1] != nextD[1]) {
-            return 600;
-        }
-        return 100;
+
+    private static boolean validation(int[][] board, int moveY, int moveX) {
+        return moveY < 0 || moveY >= length || moveX < 0 || moveX >= length || board[moveY][moveX] == 1;
+    }
+}
+
+class Node {
+    int y;
+    int x;
+    int dir;
+    int cost;
+
+    public Node(int y, int x, int dir, int cost) {
+        this.y = y;
+        this.x = x;
+        this.dir = dir;
+        this.cost = cost;
     }
 }
