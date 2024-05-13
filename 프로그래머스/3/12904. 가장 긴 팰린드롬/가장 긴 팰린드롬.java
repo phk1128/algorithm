@@ -4,54 +4,34 @@ class Solution
 {
     public int solution(String s)
     {
-        int answer = 1;
-
-        for (int i = 1; i < s.length() - 1; i++) {
-            char c = s.charAt(i);
-            int left = i - 1;
-            int right = i + 1;
-            int result = 1;
-            
-            while (left >= 0 && right < s.length()) {
-                if (Objects.equals(s.charAt(left), s.charAt(right))) {
-                    left--;
-                    right++;
-                    result += 2;
-                } else {
-                    break;
+        int answer = 0;
+        int len = s.length();
+        
+        for (int i = len; i >= 1; i--) {
+            boolean flag = false;
+            for (int j = 0; i + j <= len; j++) {
+                if (isPalindrome(j, i + j - 1, s)) {
+                    answer = i;
+                    flag = true;
                 }
             }
-            answer = Math.max(result, answer);
-        }
-        
-        
-        for (int i = 0; i < s.length() - 1; i++) {
-            char cC = s.charAt(i);
-            char nC = s.charAt(i + 1);
-            
-            if (Objects.equals(cC, nC)) {
-
-                int cIdx = i;
-                int nIdx = i + 1;
-                int left = cIdx - 1;
-                int right = nIdx + 1;
-                int result = 2;
-                
-                while (left >= 0 && right < s.length()) {
-                    
-                    if (Objects.equals(s.charAt(left), s.charAt(right))) {
-                        result += 2;
-                        left--;
-                        right++;
-                    } else {
-                        break;
-                    }
-                }
-                
-                answer = Math.max(result, answer);
+            if (flag) {
+                break;
             }
         }
 
         return answer;
+    }
+    
+    private boolean isPalindrome(int start, int end, String str) {
+        
+        while (start <= end) {
+            if (!Objects.equals(str.charAt(start++), str.charAt(end--))) {
+                return false;
+            }
+        }
+        
+        return true;
+        
     }
 }
