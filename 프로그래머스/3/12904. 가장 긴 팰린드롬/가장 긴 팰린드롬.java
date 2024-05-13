@@ -24,20 +24,6 @@ class Solution
             answer = Math.max(result, answer);
         }
         
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            int result = 1;
-            int tmpIdx = i + 1;
-            while (tmpIdx < s.length()) {
-                if (Objects.equals(s.charAt(tmpIdx), c)) {
-                    result++;
-                    tmpIdx++;
-                } else {
-                    break;
-                }
-            }
-            answer = Math.max(answer, result);
-        }
         
         for (int i = 0; i < s.length() - 1; i++) {
             char cC = s.charAt(i);
