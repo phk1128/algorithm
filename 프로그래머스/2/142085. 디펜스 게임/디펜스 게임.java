@@ -19,6 +19,7 @@ class Solution {
         }
         
         int mid = (start + end) / 2;
+        System.out.println(mid);
         int[] tmpEnemy = Arrays.stream(enemy, 0, mid + 1).toArray();
         Arrays.sort(tmpEnemy);
         int tmpN = n;
@@ -33,11 +34,10 @@ class Solution {
             if (k < tmpEnemy.length - i) {
                 flag = false;
             }
-            
             break;
         }
         
-        if (flag) {
+        if (flag){
             binarySearch(mid + 1, end, n, k, enemy);
         } else {
             binarySearch(start, mid, n, k, enemy);
