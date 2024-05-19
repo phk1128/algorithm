@@ -7,17 +7,17 @@ class Solution {
         String[] splitS = s.replace("{{", "").replace("}}", "").split("\\}\\,\\{");
         Arrays.sort(splitS, (s1, s2) -> s1.length() - s2.length());
         
-        Set<String> result = new LinkedHashSet<>();
+        Map<String, Integer> map = new HashMap<>();
         for (String str : splitS) {
-            String[] strSplit = str.split(",");
-            for (int i = 0; i < strSplit.length; i++) {
-                String tmpStr = strSplit[i];
-                result.add(tmpStr);
+            String[] splitStr = str.split(",");
+            for (int i = 0; i < splitStr.length; i++) {
+                map.put(splitStr[i], map.getOrDefault(splitStr[i],0) + 1);
             }
         }
         
+        List<String> result = new ArrayList<>(map.keySet());
+        Collections.sort(result, (r1, r2) -> map.get(r2) - map.get(r1));
         answer = result.stream().mapToInt(Integer::parseInt).toArray();
-        
         
         return answer;
     }
