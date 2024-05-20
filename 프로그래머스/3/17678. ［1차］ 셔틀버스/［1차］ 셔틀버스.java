@@ -31,7 +31,6 @@ class Solution {
         int lastBus = 0;
         int lastCrew = 0;
         int lastCount = 0;
-        System.out.println(bus);
         while (!bus.isEmpty()) {
             int busTime = bus.poll();
             int count = 0;
@@ -43,14 +42,17 @@ class Solution {
                     break;
                 }
             }
-            lastBus = busTime;
-            lastCount = count;
+            lastBus = busTime; // 마지막 버스시간 
+            lastCount = count; // 마지막 버스에 탄 크루원 수
         }
         
+        // 버스에 탑승한 크루원이 없거나 (lastCrew = 0 이면 탑승한 크루원이 없는것), 마지막 버스에 탑승한 크루원 수가 허용인원보다 적다면
+        // 마지막 버스를 타고 간다.
         if (lastCrew == 0 || lastCount < m) {
             return convertToDateTimeFormat(lastBus);
         }
         
+        // 그렇지 않다면 마지막에 탑승한 크루원보다 1분더 일찍 간다.
         return convertToDateTimeFormat(lastCrew - 1);
     }
     
