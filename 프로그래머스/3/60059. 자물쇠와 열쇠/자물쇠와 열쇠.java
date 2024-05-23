@@ -9,15 +9,15 @@ class Solution {
     public boolean solution(int[][] key, int[][] lock) {
         answer = false;
         int size = Math.max(key.length, lock.length);
-        keyMapView = new int[size][size];
-        lockMapView = new int[size][size];
-        setMapView(keyMapView, key, size);
-        setMapView(lockMapView, lock, size);
+        keyMapView = key;
+        lockMapView = lock;
+        // setMapView(keyMapView, key, size);
+        // setMapView(lockMapView, lock, size);
         
         for (int i = 0; i < 4; i++) {
             // 키 회전 
             keyMapView = getTurnKey();
-            solve(size);
+            solve(key.length);
             if (answer) {
                 break;
             }
@@ -29,8 +29,8 @@ class Solution {
     private void solve(int size) {
         
         // 키를 움직이면서 열수있는지 확인
-        for (int moveR = 1; moveR < size * 2; moveR++) {
-            for (int moveC = 1; moveC < size * 2; moveC++) {
+        for (int moveR = 1; moveR < lockMapView.length * 2; moveR++) {
+            for (int moveC = 1; moveC < lockMapView.length * 2; moveC++) {
                 if (isOpen(moveR, moveC, size)) {
                     answer = true;
                     return;
@@ -41,13 +41,13 @@ class Solution {
     
     // 자물쇠를 열수있는지 확인
     private boolean isOpen(int moveR, int moveC, int size) {
-        int[][] tmpLockMapView = new int[size][size];
-        for (int i = 0; i < size; i++) {
-            tmpLockMapView[i] = Arrays.copyOf(lockMapView[i], size);
+        int[][] tmpLockMapView = new int[lockMapView.length][lockMapView.length];
+        for (int i = 0; i < lockMapView.length; i++) {
+            tmpLockMapView[i] = Arrays.copyOf(lockMapView[i], lockMapView.length);
         }
     
-        for (int r = 0; r < size; r++) {
-            for (int c = 0; c < size; c++) {
+        for (int r = 0; r < lockMapView.length; r++) {
+            for (int c = 0; c < lockMapView.length; c++) {
                 // keyR, keyC는 자물쇠에 대응하는 열쇠의 위치들을 나타낸다.
                 // size= 3, moveR = 1, moveC = 1 이면 자물쇠 0,0 에는 열쇠의 2,2 가 대응하게 된다.
                 // size= 3, moveR = 5, moveC = 5 이면 자물쇠 2,2 에는 열쇠의 0,0 가 대응하게 된다.
@@ -60,8 +60,8 @@ class Solution {
             }
         }
         
-        for (int r = 0; r < size; r++) {
-            for (int c = 0; c < size; c++) {
+        for (int r = 0; r < lockMapView.length; r++) {
+            for (int c = 0; c < lockMapView.length; c++) {
                 if (tmpLockMapView[r][c] != 1) {
                     return false;
                 }
