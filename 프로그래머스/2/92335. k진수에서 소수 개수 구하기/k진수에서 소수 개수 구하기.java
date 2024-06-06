@@ -4,12 +4,10 @@ class Solution {
     public int solution(int n, int k) {
         int answer = 0;
         String decimal = getDecimal("", n , k);
-        String[] split = decimal.split("0");
+        String[] split = decimal.split("0+");
         
         for (String num : split) {
-            if (Objects.equals(num, "")) {
-                continue;
-            }
+            
             if (isPrime(Long.parseLong(num))) {
                 answer++;
             }
