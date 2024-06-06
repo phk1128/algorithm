@@ -12,12 +12,8 @@ class Solution {
         putStr(strMap1, strList1);
         putStr(strMap2, strList2);
         Set<String> set = new HashSet<>();
-        for (String str : strList1) {
-            set.add(str);
-        }
-        for (String str : strList2) {
-            set.add(str);
-        }
+        set.addAll(strList1);
+        set.addAll(strList2);
         double inter = 0.0;
         double union = 0.0;
         for (String str : set) {
