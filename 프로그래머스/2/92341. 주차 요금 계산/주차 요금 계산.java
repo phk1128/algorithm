@@ -1,125 +1,43 @@
 import java.util.*;
-import java.util.stream.Collectors;
 
 class Solution {
-    private final RecordGroup recordGroup = new RecordGroup();
     
     public int[] solution(int[] fees, String[] records) {
         int[] answer = {};
-        List<Integer> result = new ArrayList<>();
+        TreeMap<String, List<Double>> cars = new TreeMap<>();
         
-        for (String record : records) {
-            String[] splitRecord = record.split(" ");
-            String time = splitRecord[0];
-            String carNumber = splitRecord[1];
-            
-            if (!recordGroup.isExistByCarNumber(carNumber)) {
-                recordGroup.addRecord(new Record(carNumber));
-            }
-            
-            Record rec = recordGroup.findByCarNumber(carNumber);
-            int convertedTime = (Integer.parseInt(time.split(":")[0]) * 60) + (Integer.parseInt(time.split(":")[1]));
-            rec.addTime(convertedTime);
+        for (int i = 0; i < records.length; i++) {
+            String[] record = records[i].split(" ");
+            String[] timeSplit = record[0].split(":");
+            String carNum = record[1];
+            String command = record[2];
+            double time = Double.parseDouble(timeSplit[0]) * 60 + Double.parseDouble(timeSplit[1]);
+            List<Double> carTimes = cars.getOrDefault(carNum, new ArrayList<>());
+            carTimes.add(time);
+            cars.put(carNum, carTimes);
         }
-        
-        
-        for (Record record : recordGroup.getRecords()) {
-            int price = 0;
-            double usedTime = record.getUsedTime();
-            if (usedTime > fees[0]) {
-                price += Math.ceil((usedTime - fees[0]) / fees[2]) * fees[3];
+        answer = new int[cars.size()];
+        int idx = 0;
+        for (String key : cars.keySet()) {
+            List<Double> carTimes = cars.get(key);
+            if (carTimes.size() % 2 != 0) {
+                carTimes.add(23.0 * 60.0 + 59.0);
             }
-            price += fees[1];
-            result.add(price);
+            int price = fees[1];
+            double usedTime = 0;
+            for (int i = 0; i < carTimes.size() - 1; i += 2) {
+                double inTime = carTimes.get(i);
+                double outTime = carTimes.get(i + 1);
+                usedTime += (outTime - inTime);
+            }
+            double diffTime = usedTime - fees[0];
+            if (diffTime > 0) {
+                price += Math.ceil(diffTime / (double) fees[2]) * fees[3];
+            }
+            answer[idx++] = price;
         }
-        
-        answer = result.stream().mapToInt(i->i).toArray();
         
         return answer;
     }
-    
-    static class RecordGroup {
-        private final List<Record> records;
-        
-        public RecordGroup() {
-            this.records = new ArrayList<Record>();
-        }
-        
-        public void addRecord(Record record) {
-            records.add(record);
-        }
-        
-        public Record findByCarNumber(String carNumber) {
-            return this.records.stream()
-                .filter(record -> Objects.equals(carNumber, record.getCarNumber()))
-                .findAny()
-                .orElse(null);
-        }
-        
-        public List<Record> getRecords() {
-            return this.records.stream().sorted(Comparator.comparing(Record::getCarNumber)).collect(Collectors.toList());
-        }
-        
-        private boolean isExistByCarNumber(String carNumber) {
-            return this.records.stream()
-                .anyMatch(record -> Objects.equals(carNumber, record.getCarNumber()));
-        }
-    }
-    
-    static class Record {
-        private String carNumber; 
-        private final List<Integer> times;
-        
-        public Record(String carNumber) {
-            this.carNumber = carNumber;
-            this.times = new ArrayList<>();
-        }
-        
-        public String getCarNumber() {
-            return this.carNumber;
-        }
-        
-        public void addTime(int time) {
-            this.times.add(time);
-        }
-        
-        public double getUsedTime() {
-            if (times.size() % 2 != 0) {
-                times.add(1439); // 23:59를 분단위로 환산
-            }
-            
-            return calculateTime(0,0);
-            
-        }
-        private double calculateTime(double time, int depth) {
-            if (depth == times.size()) {
-                return time;
-            }
-            if (depth % 2 == 0) {
-                time -= times.get(depth);
-            } else {
-                time += times.get(depth);
-            }
-            
-            return calculateTime(time, depth+1);
-        }
-        
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof Record)) {
-                return false;
-            }
-            Record record = (Record) o;
-            return Objects.equals(this.carNumber, record.carNumber);
-        }
-        
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.carNumber);
-        }
-        
-    }
 }
+// 차량 번호가 작은 자동차부터 청구할 주차 요금을 차례대로 배열에 담아서 반환
