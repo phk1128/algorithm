@@ -1,79 +1,42 @@
 import java.util.*;
 
 class Solution {
-    
-    private boolean[][] visitLog;
-    private int limitX;
-    private int limitY;
-    private int answer = -1;
-    private final int[][] directions = {{-1,0},{1,0},{0,-1},{0,1}};
-    
     public int solution(int[][] maps) {
-        visitLog = new boolean[maps.length][maps[0].length];
-        Queue<Node> queue = new LinkedList<>();
-        queue.add(new Node(0,0,1));
-        System.out.println(Arrays.deepToString(visitLog));
-        
-        limitX = maps[0].length;
-        limitY = maps.length;
-        
-        visitLog[0][0] = true; // 시작점 방문처리
-        
+        int answer = -1;
+        int n = maps.length;
+        int m = maps[0].length;
+        boolean[][] visited = new boolean[n][m];
+        int[][] directions = new int[][]{{-1,0}, {1,0}, {0,-1}, {0,1}};
+        Queue<int[]> queue = new ArrayDeque<>();
+        queue.offer(new int[]{0,0,1});
+        visited[0][0] = true;
         while(!queue.isEmpty()) {
-            Node node = queue.poll();
-            int x = node.getX();
-            int y = node.getY();
-            int count = node.getCount();
+            int[] current = queue.poll();
+            int cR = current[0];
+            int cC = current[1];
+            int count = current[2];
             
-            if (isArrive(x,y)) {
-                return count;
+            if (cR == n - 1 && cC == m - 1) {
+                answer = count;
             }
             
             for (int[] direction : directions) {
-                int newX = x + direction[0];
-                int newY = y + direction[1];
-                if (!isAvailableMove(newX, newY, limitX, limitY)) {
+                int nR = cR + direction[0];
+                int nC = cC + direction[1];
+                
+                if (!(nR >= 0 && nR < n && nC >= 0 && nC < m)) {
                     continue;
                 }
-                if (maps[newY][newX] == 1 && !visitLog[newY][newX]) {
-                    // 노드가 중복으로 큐에 들어가는것을 방지하기 위해 큐에 넣기전 노드를 방문처리, 효율성을 통과하기 위한 포인트
-                    visitLog[newY][newX] = true;
-                    queue.add(new Node(newX, newY, count+1));
+                
+                if (visited[nR][nC] || maps[nR][nC] == 0) {
+                    continue;
                 }
+                
+                queue.offer(new int[]{nR, nC, count + 1});
+                visited[nR][nC] = true;
             }
         }
+        
         return answer;
-    }
-    
-    public boolean isAvailableMove(int x, int y, int limitX, int limitY) {
-        return x < limitX && x >= 0 && y < limitY && y >= 0;
-    }
-    
-    public boolean isArrive(int x, int y) {
-        return x == (limitX-1) && y == (limitY-1);
-    }
-    
-    static class Node {
-        private int x;
-        private int y;
-        private int count;
-        
-        public Node(int x, int y, int count) {
-            this.x = x;
-            this.y = y;
-            this.count = count;
-        }
-        
-        public int getX() {
-            return this.x;
-        }
-        
-        public int getY() {
-            return this.y;
-        }
-        
-        public int getCount() {
-            return this.count;
-        }
     }
 }
