@@ -17,33 +17,21 @@ class Solution {
                 queue.poll();
                 count++;
             } else {
-                result[stage - 1] = new double[]{stage, count / n};
+                double rate = count / n;
+                if (n == 0) {
+                    rate = 0;
+                }
+                result[stage - 1] = new double[]{stage, rate};
                 n -= count;
                 stage++;
                 count = 0;
             }
         }
-        
-        
-        
         Arrays.sort(result, (r1, r2) -> {
-            int num = 0;
             if (r1[1] != r2[1]) {
-                if (r1[1] < r2[1]) {
-                    num = 1;
-                }
-                if (r1[1] > r2[1]) {
-                    num = -1;
-                }
-                return num;
+                return Double.compare(r2[1], r1[1]);
             }
-            if (r1[0] < r2[0]) {
-                num = -1;
-            }
-            if (r1[0] > r2[0]) {
-                num = 1;
-            }
-            return num;
+            return Double.compare(r1[0], r2[0]);
         });
 
         answer = new int[N];
