@@ -3,56 +3,51 @@ import java.util.*;
 class Solution {
     public String solution(int[] numbers, String hand) {
         String answer = "";
-        Map<String, int[]> pad = new HashMap<>();
+        Map<Integer, int[]> pad = new HashMap<>();
         for (int r = 0; r < 3; r++) {
             for (int c = 0; c < 3; c++) {
-                pad.put(String.valueOf(((r * 3) + c) + 1), new int[]{r, c});
+                pad.put(((r * 3) + c) + 1, new int[]{r, c});
             }
         }
-        pad.put("*", new int[]{3, 0});
-        pad.put("0", new int[]{3, 1});
-        pad.put("#", new int[]{3, 2});
         
-        // for (String key : pad.keySet()) {
-        //     System.out.println(key);
-        //     System.out.println(Arrays.toString(pad.get(key)));
-        // }
+        pad.put(0, new int[]{3, 1});
+        
         int[] left = new int[]{3, 0};
         int[] right = new int[]{3, 2};
         for (int i = 0; i < numbers.length; i++) {
-            String target = String.valueOf(numbers[i]);
-            int[] num = pad.get(target);
-            if (Objects.equals(target, "1") || Objects.equals(target, "4")|| Objects.equals(target, "7")) {
+            int num = numbers[i];
+            int[] pos = pad.get(num);
+            if (num == 1 || num == 4|| num == 7) {
                 answer += "L";
-                left = num;
+                left = pos;
                 continue;
             }
             
-            if (Objects.equals(target, "3") || Objects.equals(target, "6")|| Objects.equals(target, "9")) {
+            if (num == 3 || num == 6|| num == 9) {
                 answer += "R";
-                right = num;
+                right = pos;
                 continue;
             }
             
-            int diffL = Math.abs(left[0] - num[0]) + Math.abs(left[1] - num[1]);
-            int diffR = Math.abs(right[0] - num[0]) + Math.abs(right[1] - num[1]);
+            int diffL = Math.abs(left[0] - pos[0]) + Math.abs(left[1] - pos[1]);
+            int diffR = Math.abs(right[0] - pos[0]) + Math.abs(right[1] - pos[1]);
             
             if (diffL < diffR) {
                 answer += "L";
-                left = num;
+                left = pos;
                 continue;
             }
             if (diffL > diffR) {
                 answer += "R";
-                right = num;
+                right = pos;
                 continue;
             }
             if (Objects.equals(hand, "right")) {
                 answer += "R";
-                right = num;
+                right = pos;
             } else {
                 answer += "L";
-                left = num;
+                left = pos;
             }
         }
         
