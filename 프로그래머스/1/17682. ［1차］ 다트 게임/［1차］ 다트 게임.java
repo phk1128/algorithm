@@ -4,26 +4,12 @@ import java.util.stream.*;
 class Solution {
     public int solution(String dartResult) {
         int answer = 0;
-        String[] str1 = dartResult.split("[^0-9]");
-        String[] str2 = dartResult.split("[0-9]");
-        int[] nums = new int[3];
-        String[] ops = new String[3];
-        int idx = 0;
-        for (int i = 0; i < str1.length; i++) {
-            if (!Objects.equals(str1[i], "")) {
-                nums[idx++] = Integer.parseInt(str1[i]);
-            }
-        }
-        idx = 0;
-        for (int i = 0; i < str2.length; i++) {
-            if (!Objects.equals(str2[i], "")) {
-                ops[idx++] = str2[i];
-            }
-        }
+        String[] ops = dartResult.split("[0-9]{1,2}");
+        String[] nums = dartResult.split("[SDT][*#]?");
         int[] result = new int[3];
         for (int i = 0; i < 3; i++) {
-            int num = nums[i];
-            String op = ops[i];
+            int num = Integer.parseInt(nums[i]);
+            String op = ops[i + 1];
             if (op.contains("D")) {
                 num = (int) Math.pow(num, 2);
             }
