@@ -25,16 +25,21 @@ public class Main {
             sequence[i] = Integer.parseInt(st.nextToken());
         }
 
-        lis.add(sequence[0]);
+        lis.push(sequence[0]);
 
         for (int i = 1; i < n; i++) {
             if (lis.peek() < sequence[i]) {
-                lis.add(sequence[i]);
+                lis.push(sequence[i]);
             } else {
-                binarySearch(0, lis.size() - 1, sequence[i]);
+                for (int j = 0; j < lis.size(); j++) {
+                    if (lis.get(j) >= sequence[i]) {
+                        lis.set(j, sequence[i]);
+                        break;
+                    }
+                }
             }
         }
-
+    
         bw.write(String.valueOf(lis.size()));
         bw.flush();
         bw.close();
