@@ -24,6 +24,9 @@ class Main {
 		Arrays.sort(A);
 		Arrays.sort(B);
 		
+		// System.out.println(Arrays.toString(A));
+		// System.out.println(Arrays.toString(B));
+		
 		int countA = 0;
 		int countB = 0;
 		int minA = 0;
@@ -33,7 +36,7 @@ class Main {
 			int leftA = bound;
 			rightSearch(0, N - 1, i + 2, A);
 			int rightA = bound;
-			int numA = (rightA - leftA) + 1;
+			int numA = (rightA - leftA);
 			if (A[leftA] >= i - 2) {
 				numA++;
 			}
@@ -49,7 +52,7 @@ class Main {
 			int leftB = bound;
 			rightSearch(0, N - 1, i + 2, B);
 			int rightB = bound;
-			int numB = (rightB - leftB) + 1;
+			int numB = (rightB - leftB);
 			if (B[leftB] >= i - 2) {
 				numB++;
 			}
