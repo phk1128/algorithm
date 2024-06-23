@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 class Main {
 	private static int[][][] mapView;
 	private static int[][] ds;
@@ -31,8 +33,20 @@ class Main {
 			st = new StringTokenizer(br.readLine());
 			for (int c = 0; c < N; c++) {
 				String input = st.nextToken();
-				int cnt = Integer.parseInt(input.substring(0, input.length() - 1));
-				String cmd = String.valueOf(input.charAt(input.length() - 1));
+				Pattern np = Pattern.compile("\\d+");
+				Matcher nm = np.matcher(input);
+				String ns = "";
+				while (nm.find()) {
+					ns += nm.group();
+				}
+				Pattern sp = Pattern.compile("[A-Z]+");
+				Matcher sm = sp.matcher(input);
+				String ss = "";
+				while (sm.find()) {
+					ss += sm.group();
+				}
+				int cnt = Integer.parseInt(ns);
+				String cmd = ss;
 				mapView[r][c] = new int[]{command.get(cmd), cnt};
 			}
 		}
