@@ -15,27 +15,23 @@ public class Main {
 
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		int N = Integer.parseInt(st.nextToken());
-		int[][] dp = new int[N][3];
-
-		for (int r = 0; r < N; r++) {
-			st = new StringTokenizer(br.readLine());
-			for (int c = 0; c < 3; c++) {
-				dp[r][c] = Integer.parseInt(st.nextToken());
-			}
-		}
 
 		int[][] minDp = new int[N + 1][3];
 		int[][] maxDp = new int[N + 1][3];
 
 		for (int r = 1; r <= N; r++) {
+			st = new StringTokenizer(br.readLine());
+			int c1 = Integer.parseInt(st.nextToken());
+			int c2 = Integer.parseInt(st.nextToken());
+			int c3 = Integer.parseInt(st.nextToken());
 
-			minDp[r][0] = Math.min(minDp[r - 1][0], minDp[r - 1][1]) + dp[r - 1][0];
-			minDp[r][1] = Math.min(minDp[r - 1][0], Math.min(minDp[r - 1][1], minDp[r - 1][2])) + dp[r - 1][1];
-			minDp[r][2] = Math.min(minDp[r - 1][1], minDp[r - 1][2]) + dp[r - 1][2];
+			minDp[r][0] = Math.min(minDp[r - 1][0], minDp[r - 1][1]) + c1;
+			minDp[r][1] = Math.min(minDp[r - 1][0], Math.min(minDp[r - 1][1], minDp[r - 1][2])) + c2;
+			minDp[r][2] = Math.min(minDp[r - 1][1], minDp[r - 1][2]) + c3;
 
-			maxDp[r][0] = Math.max(maxDp[r - 1][0], maxDp[r - 1][1]) + dp[r - 1][0];
-			maxDp[r][1] = Math.max(maxDp[r - 1][0], Math.max(maxDp[r - 1][1], maxDp[r - 1][2])) + dp[r - 1][1];
-			maxDp[r][2] = Math.max(maxDp[r - 1][1], maxDp[r - 1][2]) + dp[r - 1][2];
+			maxDp[r][0] = Math.max(maxDp[r - 1][0], maxDp[r - 1][1]) + c1;
+			maxDp[r][1] = Math.max(maxDp[r - 1][0], Math.max(maxDp[r - 1][1], maxDp[r - 1][2])) + c2;
+			maxDp[r][2] = Math.max(maxDp[r - 1][1], maxDp[r - 1][2]) + c3;
 
 		}
 
