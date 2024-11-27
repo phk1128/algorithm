@@ -19,16 +19,18 @@ public class Main {
         int B = Integer.parseInt(st.nextToken());
 
         mapView = new int[N][M];
-        max = 0;
+        max = Integer.MIN_VALUE;
         min = Integer.MAX_VALUE;
 
         for (int r = 0; r < N; r++) {
             st = new StringTokenizer(br.readLine());
             for (int c = 0; c < M; c++) {
-                mapView[r][c] = Integer.parseInt(st.nextToken());
+                final int h = Integer.parseInt(st.nextToken());
+                mapView[r][c] = h;
+                min = Math.min(min, h);
+                max = Math.max(max, h);
             }
         }
-        setExtremaNumber(N, M);
         final int[] answer = getAnswer(N, M, B);
 
         StringBuilder sb = new StringBuilder();
@@ -75,14 +77,5 @@ public class Main {
             }
         }
         return new int[]{B, time};
-    }
-
-    private static void setExtremaNumber(int N, int M) {
-        for (int r = 0; r < N; r++) {
-            for (int c = 0; c < M; c++) {
-                min = Math.min(min, mapView[r][c]);
-                max = Math.max(max, mapView[r][c]);
-            }
-        }
     }
 }
