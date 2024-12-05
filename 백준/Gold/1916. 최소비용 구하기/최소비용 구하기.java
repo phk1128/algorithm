@@ -57,6 +57,10 @@ public class Main {
         while (!queue.isEmpty()) {
             int[] cur = queue.poll();
             int node = cur[0];
+            
+            if (node == end) {
+                break;
+            }
 
             if (visited[node]) {
                 continue;
