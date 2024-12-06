@@ -9,9 +9,9 @@ public class Main {
 
     private static int R;
     private static int C;
-    private static String[][] mapView;
+    private static int[][] mapView;
     private static int[][] ds;
-    private static Map<String, Boolean> visited;
+    private static boolean[] visited;
     private static int max;
 
     public static void main(String[] args) throws IOException {
@@ -22,16 +22,16 @@ public class Main {
         StringTokenizer st = new StringTokenizer(br.readLine());
         R = Integer.parseInt(st.nextToken());
         C = Integer.parseInt(st.nextToken());
-        mapView = new String[R + 1][C + 1];
+        mapView = new int[R + 1][C + 1];
         ds = new int[][]{{-1,0}, {1,0}, {0,-1}, {0,1}};
-        visited = new HashMap<>();
+        visited = new boolean[26];
         max = Integer.MIN_VALUE;
 
         for (int r = 1; r <= R; r++) {
             st = new StringTokenizer(br.readLine());
-            String[] inputs = st.nextToken().split("");
+            String input = st.nextToken();
             for (int c = 1; c <= C; c++ ) {
-                mapView[r][c] = inputs[c -1];
+                mapView[r][c] = input.charAt(c - 1) - 'A';
             }
         }
         recursiveSolve(1,1 ,1);
@@ -43,7 +43,7 @@ public class Main {
     private static void recursiveSolve(int cR, int cC, int count) {
 
         max = Math.max(max, count);
-        visited.put(mapView[cR][cC], true);
+        visited[mapView[cR][cC]] = true;
 
         for (int[] d : ds) {
             int nR = cR  + d[0];
@@ -53,12 +53,12 @@ public class Main {
                 continue;
             }
 
-            if (visited.getOrDefault(mapView[nR][nC], false)) {
+            if (visited[mapView[nR][nC]]) {
                 continue;
             }
 
             recursiveSolve(nR, nC, count + 1);
-            visited.put(mapView[nR][nC], false);
+            visited[mapView[nR][nC]] = false;
         }
     }
 }
