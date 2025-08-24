@@ -1,70 +1,71 @@
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.StringTokenizer;
 
 public class Main {
 
-    private static BufferedReader br;
-    private static BufferedWriter bw;
-    private static StringTokenizer st;
-    private static String[][] mapView;
+    private static final int[] dr = new int[]{-1, 1, 0, 0};
+    private static final int[] dc = new int[]{0, 0, -1, 1};
+    private static Character[][] mapView;
     private static boolean[][] visited;
-    private static int n;
-    private static int m;
     private static int[] start;
-    private static int[][] directions;
-    private static int answer;
+    private static int N;
+    private static int M;
+    private static int count;
+
 
     public static void main(String[] args) throws IOException {
 
-        br = new BufferedReader(new InputStreamReader(System.in));
-        bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        mapView = new Character[N][M];
+        visited = new boolean[N][M];
 
-        st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());
-        m = Integer.parseInt(st.nextToken());
-        mapView = new String[n][m];
-        visited = new boolean[n][m];
-        directions = new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-        answer = 0;
-
-        for (int i = 0; i < n; i++) {
-            st = new StringTokenizer(br.readLine());
-            String[] positionSplit = st.nextToken().split("");
-            for (int j = 0; j < m; j++) {
-                mapView[i][j] = positionSplit[j];
-                if (Objects.equals(positionSplit[j], "X")) {
-                    visited[i][j] = true;
-                }
-                if (Objects.equals(positionSplit[j], "I")) {
-                    start = new int[]{j, i};
+        for (int r = 0; r < N; r++) {
+            final String row = br.readLine();
+            for (int c = 0; c < M; c++) {
+                final char el = row.charAt(c);
+                mapView[r][c] = el;
+                if (el == 'I') {
+                    start = new int[]{r, c};
                 }
             }
         }
-        recursiveSolve(start[0], start[1]);
-
-        if (answer == 0) {
-            bw.write("TT");
-            bw.flush();
-        } else {
-            bw.write(String.valueOf(answer));
-            bw.flush();
+        solve();
+        if (count == 0) {
+            System.out.println("TT");
+            return;
         }
-        bw.close();
+        System.out.println(count);
     }
 
-    private static void recursiveSolve(int x, int y) {
-        visited[y][x] = true;
-        if (Objects.equals(mapView[y][x], "P")) {
-            answer++;
-        }
-
-        for (int[] direction : directions) {
-            int newX = x + direction[0];
-            int newY = y + direction[1];
-            if (newX >= 0 && newX < m && newY >= 0 && newY < n) {
-                if (!visited[newY][newX]) {
-                    recursiveSolve(newX, newY);
+    private static void solve() {
+        Queue<int[]> queue = new ArrayDeque();
+        queue.offer(new int[]{start[0], start[1]});
+        while(!queue.isEmpty()) {
+            final int[] cur = queue.poll();
+            for (int i = 0; i < 4; i++) {
+                final int nR = cur[0] + dr[i];
+                final int nC = cur[1] + dc[i];
+                if (!(nR >= 0 && nR <= N - 1 && nC >= 0 && nC <= M - 1)) {
+                    continue;
                 }
+                if (visited[nR][nC]) {
+                    continue;
+                }
+                if (mapView[nR][nC] == 'X') {
+                    continue;
+                }
+                if (mapView[nR][nC] == 'P') {
+                    count++;
+                }
+                visited[nR][nC] = true;
+                queue.offer(new int[]{nR, nC});
             }
         }
     }
