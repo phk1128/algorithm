@@ -15,19 +15,19 @@ class Solution {
             String number = "";
             String[] splitFile = files[i].split("");
             for (int j = 0; j < splitFile.length; j++) {
-                try {
-                    Integer.parseInt(splitFile[j]);
-                    for (int k = j; k < splitFile.length; k++) {
-                        try {
-                            number += String.valueOf(Integer.parseInt(splitFile[k]));
-                        } catch(Exception e) {
-                            break;
-                        }
+                if (!Character.isDigit(files[i].charAt(j))) {
+                    head += splitFile[j];
+                    continue;
+                }
+                for (int k = j; k < splitFile.length; k++) {
+                    
+                    if (Character.isDigit(files[i].charAt(k))) {
+                        number += String.valueOf(Integer.parseInt(splitFile[k]));
+                        continue;
                     }
                     break;
-                } catch(Exception e) {
-                    head += splitFile[j];
                 }
+                break;
             }
             fileNames.add(new FileName(head, number, files[i]));
         }
