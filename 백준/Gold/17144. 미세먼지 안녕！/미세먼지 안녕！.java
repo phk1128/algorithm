@@ -1,160 +1,128 @@
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 public class Main {
 
-    private static BufferedReader br;
-    private static BufferedWriter bw;
-    private static StringTokenizer st;
     private static int R;
     private static int C;
     private static int T;
     private static int[][] mapView;
-    private static int upAirR;
-    private static int downAirR;
-    private static int upAirC;
-    private static int downAirC;
+    private static int[] cleaners;
+    private static int[][] diffMapView;
+    private static int[] dr;
+    private static int[] dc;
     private static boolean[][] visited;
-    private static int[][] directions;
 
     public static void main(String[] args) throws IOException {
 
-        br = new BufferedReader(new InputStreamReader(System.in));
-        bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        st = new StringTokenizer(br.readLine());
+        StringTokenizer st = new StringTokenizer(br.readLine());
         R = Integer.parseInt(st.nextToken());
         C = Integer.parseInt(st.nextToken());
         T = Integer.parseInt(st.nextToken());
 
         mapView = new int[R][C];
-        List<int[]> airCleaners = new ArrayList<>();
-        directions = new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-
+        cleaners = new int[2];
+        int cleanerIdx = 0;
         for (int r = 0; r < R; r++) {
             st = new StringTokenizer(br.readLine());
             for (int c = 0; c < C; c++) {
-                int number = Integer.parseInt(st.nextToken());
-                mapView[r][c] = number;
-                if (number == -1) {
-                    airCleaners.add(new int[]{r, c});
+                int el = Integer.parseInt(st.nextToken());
+                mapView[r][c] = el;
+                if (el == -1) {
+                    cleaners[cleanerIdx++] = r;
                 }
             }
         }
-        upAirR = airCleaners.get(0)[0];
-        downAirR = airCleaners.get(1)[0];
-        upAirC = airCleaners.get(0)[1];
-        downAirC = airCleaners.get(1)[1];
 
+        dr = new int[]{-1, 1, 0, 0};
+        dc = new int[]{0, 0, -1, 1};
+        int upCleanerR = cleaners[0];
+        int downCleanerR = cleaners[1];
         while (T-- > 0) {
-            int[][] diffusionMapView = new int[R][C];
-            int[][] moveMapView = new int[R][C];
+            diffMapView = new int[R][C];
             visited = new boolean[R][C];
-            recursiveSolve(0, 0, diffusionMapView);
-            visited = new boolean[R][C];
-            moveDust(0, 0, diffusionMapView, moveMapView);
-            mapView = moveMapView;
-            mapView[upAirR][upAirC] = -1;
-            mapView[downAirR][downAirC] = -1;
+            diffuse(0, 0);
+            moveDust(upCleanerR, downCleanerR);
+            mapView = diffMapView;
+            mapView[upCleanerR][0] = 0;
+            mapView[downCleanerR][0] = 0;
         }
-        int answer = 0;
+
+        int ans = 0;
         for (int r = 0; r < R; r++) {
             for (int c = 0; c < C; c++) {
-                answer += mapView[r][c];
+                ans += mapView[r][c];
             }
         }
-        answer += 2;
-
-        bw.write(String.valueOf(answer));
-        bw.flush();
-        bw.close();
+        System.out.println(ans);
     }
 
-    private static void recursiveSolve(int r, int c, int[][] diffusionMapView) {
+    private static void moveDust(int upCleanerR, int downCleanerR) {
+
+        for (int r = upCleanerR - 1; r > 0; r--) {
+            diffMapView[r][0] = diffMapView[r - 1][0];
+        }
+
+        for (int r = downCleanerR + 1; r < R - 1; r++) {
+            diffMapView[r][0] = diffMapView[r + 1][0];
+        }
+
+        for (int c = 0; c < C - 1; c++) {
+            diffMapView[0][c] = diffMapView[0][c + 1];
+            diffMapView[R - 1][c] = diffMapView[R - 1][c + 1];
+        }
+
+        for (int r = 0; r < upCleanerR; r++) {
+            diffMapView[r][C - 1] = diffMapView[r + 1][C - 1];
+        }
+
+        for (int r = R - 1; r > downCleanerR; r--) {
+            diffMapView[r][C - 1] = diffMapView[r - 1][C - 1];
+        }
+
+        for (int c = C - 1; c > 0; c--) {
+            diffMapView[upCleanerR][c] = diffMapView[upCleanerR][c - 1];
+            diffMapView[downCleanerR][c] = diffMapView[downCleanerR][c - 1];
+        }
+    }
+
+    private static void diffuse(int r, int c) {
         visited[r][c] = true;
-        if (mapView[r][c] != 0 && mapView[r][c] != -1) {
-            diffusion(r, c, diffusionMapView);
+        if (mapView[r][c] != 0 && !isCleaner(r, c)) {
+            diffuseFromCell(r, c);
         }
-
-        for (int[] direction : directions) {
-            int newR = r + direction[0];
-            int newC = c + direction[1];
-            if (newR >= 0 && newR < R && newC >= 0 && newC < C) {
-                if (!visited[newR][newC]) {
-                    recursiveSolve(newR, newC, diffusionMapView);
-                }
+        for (int i = 0; i < 4; i++) {
+            int nR = r + dr[i];
+            int nC = c + dc[i];
+            if (isIn(nR, nC) && !visited[nR][nC]) {
+                diffuse(nR, nC);
             }
         }
     }
 
-    private static void diffusion(int r, int c, int[][] diffusionMapView) {
-
-        int dust = mapView[r][c] / 5;
-        int count = 0;
-        for (int[] direction : directions) {
-            int newR = r + direction[0];
-            int newC = c + direction[1];
-            if (newR >= 0 && newR < R && newC >= 0 && newC < C) {
-                if (mapView[newR][newC] != -1) {
-                    diffusionMapView[newR][newC] += dust;
-                    count++;
-                }
+    private static void diffuseFromCell(int r, int c) {
+        int curDust = mapView[r][c];
+        int diffDust = mapView[r][c] / 5;
+        for (int i = 0; i < 4; i++) {
+            int nR = r + dr[i];
+            int nC = c + dc[i];
+            if ((isIn(nR, nC)) && !isCleaner(nR, nC)) {
+                diffMapView[nR][nC] += diffDust;
+                curDust -= diffDust;
             }
         }
-        int number = mapView[r][c] - (dust * count);
-        diffusionMapView[r][c] += number;
+        diffMapView[r][c] += curDust;
     }
 
-    private static void moveDust(int r, int c, int[][] diffusionMapView, int[][] moveMapView) {
+    private static boolean isCleaner(int r, int c) {
+        return (r == cleaners[0] && c == 0) || (r == cleaners[1] && c == 0);
+    }
 
-        visited[r][c] = true;
-        if (r > 0 && r < R - 1 && c > 0 && c < C - 1) {
-            if (!(r == upAirR || r == downAirR)) {
-                moveMapView[r][c] = diffusionMapView[r][c];
-            }
-        }
-        if (r == upAirR || r == downAirR) {
-            if (c > 1 && c < C) {
-                moveMapView[r][c] = diffusionMapView[r][c - 1];
-            }
-        }
-
-        if (c == C - 1) {
-            if (r < upAirR && r >= 0) {
-                moveMapView[r][c] = diffusionMapView[r + 1][c];
-            }
-
-            if (r > downAirR && r < R) {
-                moveMapView[r][c] = diffusionMapView[r - 1][c];
-            }
-        }
-
-        if (r == R - 1 || r == 0) {
-            if (c < C - 1 && c >= 0) {
-                moveMapView[r][c] = diffusionMapView[r][c + 1];
-            }
-        }
-
-        if (c == 0) {
-            if (r < upAirR && r > 0) {
-                moveMapView[r][c] = diffusionMapView[r - 1][c];
-            }
-
-            if (r > downAirR && r < R - 1) {
-                moveMapView[r][c] = diffusionMapView[r + 1][c];
-            }
-        }
-
-        for (int[] direction : directions) {
-            int newR = r + direction[0];
-            int newC = c + direction[1];
-
-            if (newR >= 0 && newR < R && newC >= 0 && newC < C) {
-                if (!visited[newR][newC]) {
-                    moveDust(newR, newC, diffusionMapView, moveMapView);
-                }
-            }
-        }
-
+    private static boolean isIn(int r, int c) {
+        return r >= 0 && r <= R - 1 && c >= 0 && c <= C - 1;
     }
 }
