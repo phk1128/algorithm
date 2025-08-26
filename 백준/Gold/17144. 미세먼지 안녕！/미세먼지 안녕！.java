@@ -13,7 +13,6 @@ public class Main {
     private static int[][] diffMapView;
     private static int[] dr;
     private static int[] dc;
-    private static boolean[][] visited;
 
     public static void main(String[] args) throws IOException {
 
@@ -44,8 +43,7 @@ public class Main {
         int downCleanerR = cleaners[1];
         while (T-- > 0) {
             diffMapView = new int[R][C];
-            visited = new boolean[R][C];
-            diffuse(0, 0);
+            diffuse();
             moveDust(upCleanerR, downCleanerR);
             mapView = diffMapView;
             mapView[upCleanerR][0] = 0;
@@ -90,16 +88,12 @@ public class Main {
         }
     }
 
-    private static void diffuse(int r, int c) {
-        visited[r][c] = true;
-        if (mapView[r][c] != 0 && !isCleaner(r, c)) {
-            diffuseFromCell(r, c);
-        }
-        for (int i = 0; i < 4; i++) {
-            int nR = r + dr[i];
-            int nC = c + dc[i];
-            if (isIn(nR, nC) && !visited[nR][nC]) {
-                diffuse(nR, nC);
+    private static void diffuse() {
+        for (int r = 0; r < R; r++) {
+            for (int c = 0; c < C; c++) {
+                if (mapView[r][c] > 0 &&!isCleaner(r, c)) {
+                    diffuseFromCell(r, c);
+                }
             }
         }
     }
