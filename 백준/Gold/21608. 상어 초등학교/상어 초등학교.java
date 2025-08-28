@@ -1,158 +1,163 @@
-// 1. 인접한 칸에 좋아하는 학생이 가장 많은 칸으로 자리를 정한다. (좋아하는 학생은 4명)
-// 2. 1을 만족칸이 여러개면, 인접한 칸 중에서 비어 있는 칸이 가장 많은 칸으로 자리를 정한다.
-// 3. 2를 만족하는 칸이 여러개면, 행번호가 가장 작은 칸으로, 그러한 칸도 여러개면 열의 번호가 가장 작은 칸으로 자리를 정한다.
-// 4. 만족도는 각 학생별로 인접한 칸에 좋아하는 학생이 몇명인지에 따라 결정된다.
-// 5. 인접한 칸에 좋아하는 학생이 0 -> 1 / 1 -> 2 / 2 -> 10 / 3 -> 100 / 4 -> 1000
-// 만족도의 총 합을 구해보자
-
-// Seat 객체 만들기
-// Seat 객체 compareTo 오버라이딩 1,2,3 조건에 맞게 구현
-// 입력을 받는 동시에 자리 배정하기
-// 모든 자리를 배치 후 맵을 돌면서 주변에 좋아하는 학생이 몇명인지 체크하면서 답 계산
-
-
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringTokenizer;
 
 public class Main {
 
-    private static BufferedReader br;
-    private static BufferedWriter bw;
-    private static StringTokenizer st;
     private static int N;
-    private static List<Integer>[][] students;
     private static int[][] mapView;
-    private static int[][] directions;
-    private static List<Seat> seats;
-    private static int[] score;
-
-    static class Seat implements Comparable<Seat> {
-
-        int r;
-        int c;
-        int favorite;
-        int empty;
-
-        public Seat(int r, int c, int favorite, int empty) {
-            this.r = r;
-            this.c = c;
-            this.favorite = favorite;
-            this.empty = empty;
-        }
-
-        @Override
-        public int compareTo(Seat s) {
-
-            if (this.favorite != s.favorite) {
-                return s.favorite - this.favorite;
-            }
-            if (this.empty != s.empty) {
-                return s.empty - this.empty;
-            }
-            if (this.r != s.r) {
-                return this.r - s.r;
-            }
-            return this.c - s.c;
-        }
-    }
+    private static int[] dr;
+    private static int[] dc;
+    private static Student[] students;
 
     public static void main(String[] args) throws IOException {
 
-        br = new BufferedReader(new InputStreamReader(System.in));
-        bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        st = new StringTokenizer(br.readLine());
-
+        StringTokenizer st = new StringTokenizer(br.readLine());
         N = Integer.parseInt(st.nextToken());
         mapView = new int[N][N];
-        students = new ArrayList[N * N + 1][1];
-        directions = new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-        score = new int[]{0, 1, 10, 100, 1000};
+        dr = new int[]{-1, 1, 0, 0};
+        dc = new int[]{0, 0, -1, 1};
+        students = new Student[N * N + 1];
 
-        for (int i = 0; i < N * N; i++) {
-            st = new StringTokenizer(br.readLine());
-            int number = Integer.parseInt(st.nextToken());
-            students[number][0] = new ArrayList<>();
-
-            for (int j = 0; j < 4; j++) {
-                students[number][0].add(Integer.parseInt(st.nextToken()));
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < N; c++) {
+                st = new StringTokenizer(br.readLine());
+                int number = Integer.parseInt(st.nextToken());
+                final Student student = new Student(number, new ArrayList<>());
+                student.addLikeNumber(Integer.parseInt(st.nextToken()));
+                student.addLikeNumber(Integer.parseInt(st.nextToken()));
+                student.addLikeNumber(Integer.parseInt(st.nextToken()));
+                student.addLikeNumber(Integer.parseInt(st.nextToken()));
+                students[number] = student;
+                searchSit(number, student.likeNumbers);
             }
-            solve(number);
         }
-
-        bw.write(String.valueOf(getAnswer()));
-        bw.flush();
-        bw.close();
-    }
-
-    private static int getAnswer() {
         int answer = 0;
-
         for (int r = 0; r < N; r++) {
             for (int c = 0; c < N; c++) {
-                int number = mapView[r][c];
-                int favorite = 0;
-                for (int[] direction : directions) {
-                    int newR = r + direction[0];
-                    int newC = c + direction[1];
-                    if (!(newR >= 0 && newR < N && newC >= 0 && newC < N)) {
-                        continue;
-                    }
-
-                    if (students[number][0].contains(mapView[newR][newC])) {
-                        favorite++;
-                    }
-
-                }
-
-                answer += score[favorite];
+                answer += calculateScore(r, c);
             }
         }
-
-        return answer;
+        System.out.println(answer);
     }
 
-    private static void solve(int number) {
-
-        seats = new ArrayList<>();
-
+    private static void searchSit(int number, List<Integer> likeNumber) {
+        List<Sit> sits = new ArrayList<>();
         for (int r = 0; r < N; r++) {
             for (int c = 0; c < N; c++) {
-                if (mapView[r][c] == 0) {
-                    addSeat(r, c, number);
+                if (mapView[r][c] != 0) {
+                    continue;
                 }
+                int empty = countEmpty(r, c);
+                int like = countLike(r, c, likeNumber);
+                sits.add(new Sit(r, c, like, empty));
             }
         }
-        Collections.sort(seats);
-        mapView[seats.get(0).r][seats.get(0).c] = number;
+        Collections.sort(sits);
+        Sit sit = sits.get(0);
+        mapView[sit.r][sit.c] = number;
     }
 
-    private static void addSeat(int r, int c, int number) {
-
-        int favorite = 0;
-        int empty = 0;
-
-        for (int[] direction : directions) {
-
-            int newR = r + direction[0];
-            int newC = c + direction[1];
-
-            if (!(newR >= 0 && newR < N && newC >= 0 && newC < N)) {
+    private static int calculateScore(int r, int c) {
+        int number = mapView[r][c];
+        List<Integer> likeNumbers = students[number].likeNumbers;
+        int score = 0;
+        int count = 0;
+        for (int i = 0; i < 4; i++) {
+            int nR = r + dr[i];
+            int nC = c + dc[i];
+            if(!(nR >= 0 && nR < N && nC >= 0 && nC < N)) {
                 continue;
             }
-
-            int tmpNumber = mapView[newR][newC];
-
-            if (tmpNumber == 0) {
-                empty++;
+            if (!likeNumbers.contains(mapView[nR][nC])) {
+                continue;
             }
-
-            if (students[number][0].contains(tmpNumber)) {
-                favorite++;
-            }
+            count++;
         }
-        seats.add(new Seat(r, c, favorite, empty));
+        if (count != 0) {
+            score = (int) Math.pow(10, count - 1);
+        }
+        return score;
+    }
+
+
+    private static int countEmpty(int r, int c) {
+        int count = 0;
+        for (int i = 0; i < 4; i++) {
+            int nR = r + dr[i];
+            int nC = c + dc[i];
+            if (!(nR >= 0 && nR < N && nC >= 0 && nC < N)) {
+                continue;
+            }
+            if (mapView[nR][nC] != 0) {
+                continue;
+            }
+            count++;
+        }
+        return count;
+    }
+
+    private static int countLike(int r, int c, List<Integer> likeNumber) {
+        int count = 0;
+        for (int i = 0; i < 4; i++) {
+            int nR = r + dr[i];
+            int nC = c + dc[i];
+            if (!(nR >= 0 && nR < N && nC >= 0 && nC < N)) {
+                continue;
+            }
+            if (mapView[nR][nC] == 0) {
+                continue;
+            }
+            if (!likeNumber.contains(mapView[nR][nC])) {
+                continue;
+            }
+            count++;
+        }
+        return count;
+    }
+
+    static class Student{
+        int number;
+        List<Integer> likeNumbers;
+
+        public Student(final int number, final List<Integer> likeNumbers) {
+            this.number = number;
+            this.likeNumbers = likeNumbers;
+        }
+
+        public void addLikeNumber(int number) {
+            likeNumbers.add(number);
+        }
+    }
+
+    static class Sit implements Comparable<Sit>{
+        int r;
+        int c;
+        int likeCount;
+        int emptyCount;
+
+        public Sit(final int r, final int c, final int likeCount, final int emptyCount) {
+            this.r = r;
+            this.c = c;
+            this.likeCount = likeCount;
+            this.emptyCount = emptyCount;
+        }
+
+        @Override
+        public int compareTo(Sit other) {
+            if (this.likeCount != other.likeCount) {
+                return other.likeCount - this.likeCount;
+            }
+            if (this.emptyCount != other.emptyCount) {
+                return other.emptyCount - this.emptyCount;
+            }
+            return this.r - other.r;
+        }
     }
 }
-
-
