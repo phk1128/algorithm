@@ -4,7 +4,6 @@ import java.io.*;
 public class Main {
 
     private static BufferedReader br;
-    private static BufferedWriter bw;
     private static StringTokenizer st;
     private static int[][] mapView;
     private static boolean[][] visited;
@@ -15,7 +14,6 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         br = new BufferedReader(new InputStreamReader(System.in));
-        bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
         st = new StringTokenizer(br.readLine());
         n = Integer.parseInt(st.nextToken());
@@ -39,9 +37,7 @@ public class Main {
 
         recursiveSolve(babyShark);
 
-        bw.write(String.valueOf(answer));
-        bw.flush();
-        bw.close();
+        System.out.println(answer);
     }
 
     private static void recursiveSolve(BabyShark babyShark) {
