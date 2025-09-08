@@ -14,7 +14,7 @@ public class Main {
         StringBuilder sb = new StringBuilder();
         st = new StringTokenizer(br.readLine());
         int m = Integer.parseInt(st.nextToken());
-        int s = 0; // 0000 0000 / 0000 0000 / 0000 0000 / 0000 0000 총 32비트 이며 맨앞 32번째 비트가 1이면 음수, 0이면 양수
+        int s = 0;
         
         while (m-- > 0) {
             st = new StringTokenizer(br.readLine());
