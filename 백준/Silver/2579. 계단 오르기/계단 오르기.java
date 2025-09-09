@@ -17,7 +17,7 @@ public class Main {
         int n = Integer.parseInt(st.nextToken());
 
         steps = new int[n + 1];
-        dp = new int[n + 1];
+        dp = new int[n + 1]; // 해당 계단으로 올 수 있는 최대값이 저장되어 있다.
 
         for (int i = 1; i <= n; i++) {
             st = new StringTokenizer(br.readLine());
