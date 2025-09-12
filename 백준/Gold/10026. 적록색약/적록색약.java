@@ -4,83 +4,67 @@ import java.io.*;
 public class Main {
 
     private static BufferedReader br;
-    private static BufferedWriter bw;
     private static StringTokenizer st;
     private static int[][] directions;
-    private static String[] colors;
     private static int n;
-    private static int answer1; // 정상
-    private static int answer2; // 색약
+    private static int normalCount;
+    private static int weakCount;
 
     public static void main(String[] args) throws IOException {
 
         br = new BufferedReader(new InputStreamReader(System.in));
-        bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        n = Integer.parseInt(br.readLine());
 
-        st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());
+        String[][] normalMap = new String[n][n];
+        String[][] colorWeakMap = new String[n][n];
 
-        String[][] mapView1 = new String[n][n]; // 정상
-        String[][] mapView2 = new String[n][n]; // 색약
-
-        boolean[][] visited1 = new boolean[n][n];
-        boolean[][] visited2 = new boolean[n][n];
+        boolean[][] visitedNormal = new boolean[n][n];
+        boolean[][] visitedWeak = new boolean[n][n];
 
         directions = new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-        colors = new String[]{"R", "G", "B"};
-        answer1 = 0; // 정상
-        answer2 = 0; // 색약
+        normalCount = 0;
+        weakCount = 0;
 
         for (int i = 0; i < n; i++) {
-            st = new StringTokenizer(br.readLine());
-            String[] view = st.nextToken().split("");
+            String[] row = br.readLine().split("");
             for (int j = 0; j < n; j++) {
-                mapView1[i][j] = view[j]; // 정상
-                mapView2[i][j] = view[j];
-                if (Objects.equals(view[j], "G")) {
-                    mapView2[i][j] = "R";
+                normalMap[i][j] = row[j];
+                colorWeakMap[i][j] = row[j];
+                if (row[j].equals("G")) {
+                    colorWeakMap[i][j] = "R";
                 }
             }
         }
+
+        String[] colors = {"R", "G", "B"};
 
         for (String color : colors) {
             for (int y = 0; y < n; y++) {
                 for (int x = 0; x < n; x++) {
-                    if (!visited1[y][x] && Objects.equals(color, mapView1[y][x])) {
-                        recursiveSolve(color, x, y, mapView1, visited1);
-                        answer1++;
+                    if (!visitedNormal[y][x] && normalMap[y][x].equals(color)) {
+                        dfs(color, x, y, normalMap, visitedNormal);
+                        normalCount++;
                     }
-
-                    if (!visited2[y][x] && Objects.equals(color, mapView2[y][x])) {
-                        recursiveSolve(color, x, y, mapView2, visited2);
-                        answer2++;
+                    if (!visitedWeak[y][x] && colorWeakMap[y][x].equals(color)) {
+                        dfs(color, x, y, colorWeakMap, visitedWeak);
+                        weakCount++;
                     }
                 }
             }
         }
 
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(answer1);
-        sb.append(" ");
-        sb.append(answer2);
-
-        bw.write(sb.toString());
-        bw.flush();
-        bw.close();
-
+        System.out.println(normalCount + " " + weakCount);
     }
 
-    private static void recursiveSolve(String color, int x, int y, String[][] mapView, boolean[][] visited) {
-
+    private static void dfs(String color, int x, int y, String[][] map, boolean[][] visited) {
         visited[y][x] = true;
 
-        for (int[] direction : directions) {
-            int newX = x + direction[0];
-            int newY = y + direction[1];
-            if (newX >= 0 && newX < n && newY >= 0 && newY < n) {
-                if (!visited[newY][newX] && Objects.equals(color, mapView[newY][newX])) {
-                    recursiveSolve(color, newX, newY, mapView, visited);
+        for (int[] dir : directions) {
+            int nx = x + dir[0];
+            int ny = y + dir[1];
+            if (nx >= 0 && nx < n && ny >= 0 && ny < n) {
+                if (!visited[ny][nx] && map[ny][nx].equals(color)) {
+                    dfs(color, nx, ny, map, visited);
                 }
             }
         }
