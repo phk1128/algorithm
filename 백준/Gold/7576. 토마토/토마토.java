@@ -4,32 +4,30 @@ import java.io.*;
 public class Main {
 
     private static BufferedReader br;
-    private static BufferedWriter bw;
     private static StringTokenizer st;
 
     private static int m;
     private static int n;
-    private static boolean[][] visited;
-    private static List<int[]> initTomato;
+    private static boolean[][] unripe;
+    private static List<int[]> ripeTomatoes;
     private static int[][] directions;
-    private static int emptyCount;
-    private static int day;
-    private static int tomatoCount;
+    private static int emptyCells;
+    private static int days;
+    private static int ripenedCount;
 
     public static void main(String[] args) throws IOException {
 
         br = new BufferedReader(new InputStreamReader(System.in));
-        bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
         st = new StringTokenizer(br.readLine());
         m = Integer.parseInt(st.nextToken());
         n = Integer.parseInt(st.nextToken());
 
-        visited = new boolean[n][m];
-        initTomato = new ArrayList<>();
-        emptyCount = 0;
-        day = 0;
-        tomatoCount = 0;
+        unripe = new boolean[n][m];
+        ripeTomatoes = new ArrayList<>();
+        emptyCells = 0;
+        days = 0;
+        ripenedCount = 0;
         directions = new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
         for (int i = 0; i < n; i++) {
@@ -37,56 +35,54 @@ public class Main {
             for (int j = 0; j < m; j++) {
                 int v = Integer.parseInt(st.nextToken());
                 if (v == -1) {
-                    emptyCount++;
+                    emptyCells++;
                 }
                 if (v == 0 || v == 1) {
-                    visited[i][j] = true;
+                    unripe[i][j] = true;
                     if (v == 1) {
-                        visited[i][j] = false;
-                        initTomato.add(new int[]{j, i});
+                        unripe[i][j] = false;
+                        ripeTomatoes.add(new int[]{j, i});
                     }
                 }
             }
         }
-        solve();
-        if ((n * m) - emptyCount != tomatoCount) {
-            day = -1;
+        bfs();
+        if ((n * m) - emptyCells != ripenedCount) {
+            days = -1;
         }
 
-        bw.write(String.valueOf(day));
-        bw.flush();
-        bw.close();
+        System.out.println(days);
     }
 
-    private static void solve() {
+    private static void bfs() {
         Queue<List<int[]>> queue = new LinkedList<>();
-        queue.offer(initTomato);
+        queue.offer(ripeTomatoes);
         while (!queue.isEmpty()) {
-            List<int[]> tomato = new ArrayList<>();
-            for (int[] target : queue.poll()) {
-                tomatoCount++;
-                tomato.addAll(findTomato(target[1], target[0]));
+            List<int[]> nextRipe = new ArrayList<>();
+            for (int[] tomato : queue.poll()) {
+                ripenedCount++;
+                nextRipe.addAll(spread(tomato[1], tomato[0]));
             }
-            if (!tomato.isEmpty()) {
-                queue.offer(tomato);
-                day++;
+            if (!nextRipe.isEmpty()) {
+                queue.offer(nextRipe);
+                days++;
             }
         }
     }
 
-    private static List<int[]> findTomato(int y, int x) {
-        List<int[]> tomato = new ArrayList<>();
-        visited[y][x] = false;
-        for (int[] direction : directions) {
-            int newX = x + direction[0];
-            int newY = y + direction[1];
+    private static List<int[]> spread(int y, int x) {
+        List<int[]> next = new ArrayList<>();
+        unripe[y][x] = false;
+        for (int[] dir : directions) {
+            int newX = x + dir[0];
+            int newY = y + dir[1];
             if (newX >= 0 && newX < m && newY >= 0 && newY < n) {
-                if (visited[newY][newX]) {
-                    visited[newY][newX] = false;
-                    tomato.add(new int[]{newX, newY});
+                if (unripe[newY][newX]) {
+                    unripe[newY][newX] = false;
+                    next.add(new int[]{newX, newY});
                 }
             }
         }
-        return tomato;
+        return next;
     }
 }
