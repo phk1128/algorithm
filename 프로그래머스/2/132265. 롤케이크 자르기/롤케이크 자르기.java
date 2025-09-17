@@ -4,19 +4,19 @@ class Solution {
     
     private static Map<Integer, Integer> map;
     private static Set<Integer> set;
-    private static int count;
-    private static int answer;
+    private static int cnt;
+    private static int ans;
     
     public int solution(int[] topping) {
         map = new HashMap<>();
         set = new HashSet<>();
-        count = 0;
-        answer = 0;
+        cnt = 0;
+        ans = 0;
         
         solve(topping);
         
             
-        return answer;
+        return ans;
     }
     
     private static void solve(int[] topping) {
@@ -25,7 +25,7 @@ class Solution {
             
             int value = map.getOrDefault(topping[i],0);
             if (value == 0) {
-                count++;
+                cnt++;
             }
             map.put(topping[i], value + 1);
             
@@ -40,13 +40,13 @@ class Solution {
             int value = map.get(topping[i]);
             
             if (value == 1) {
-                count--;
+                cnt--;
             }
             
             map.replace(topping[i], value - 1);
             
-            if (count == set.size()) {
-                answer++;
+            if (cnt == set.size()) {
+                ans++;
             }
             
         }
