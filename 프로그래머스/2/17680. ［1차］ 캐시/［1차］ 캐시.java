@@ -2,45 +2,43 @@ import java.util.*;
 
 class Solution {
     
-    private static List<String> list;
+    private static List<String> cache;
     
-    public int solution(int cacheSize, String[] cities) {
-        int answer = 0;
-        list = new ArrayList<>();
+    public int solution(int cacheSize, String[] cityRequests) {
+        int totalTime = 0;
+        cache = new ArrayList<>();
         
-        
-        for (String city : cities) {
+        for (String currentCity : cityRequests) {
             if (cacheSize == 0) {
-                answer += 5;
+                totalTime += 5;
                 continue;
             }
             
-            city = city.toUpperCase();
+            currentCity = currentCity.toUpperCase();
             
-            if (list.isEmpty()) {
-                list.add(city);
-                answer += 5;
+            if (cache.isEmpty()) {
+                cache.add(currentCity);
+                totalTime += 5;
                 continue;
             }
             
-            
-            if (list.contains(city)) {
-                list.remove(city);
-                list.add(city);
-                answer += 1;
+            if (cache.contains(currentCity)) {
+                cache.remove(currentCity);
+                cache.add(currentCity);
+                totalTime += 1;
                 continue;
             }
             
-            answer += 5;
+            totalTime += 5;
             
-            if (list.size() < cacheSize) {
-                list.add(city);
+            if (cache.size() < cacheSize) {
+                cache.add(currentCity);
                 continue;
             }
             
-            list.remove(0);
-            list.add(city);
+            cache.remove(0);
+            cache.add(currentCity);
         }
-        return answer;
+        return totalTime;
     }
 }
