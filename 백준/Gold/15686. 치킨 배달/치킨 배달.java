@@ -6,10 +6,10 @@ public class Main {
     private static BufferedReader br;
     private static BufferedWriter bw;
     private static StringTokenizer st;
-    private static List<int[]> chickens;
-    private static List<int[]> homes;
-    private static int min;
-    private static int[] combination;
+    private static List<int[]> chList;
+    private static List<int[]> hsList;
+    private static int ans;
+    private static int[] pick;
 
     public static void main(String[] args) throws IOException {
 
@@ -20,49 +20,45 @@ public class Main {
         int n = Integer.parseInt(st.nextToken());
         int m = Integer.parseInt(st.nextToken());
 
-        chickens = new ArrayList<>();
-        homes = new ArrayList<>();
-        min = Integer.MAX_VALUE;
-        combination = new int[m];
+        chList = new ArrayList<>();
+        hsList = new ArrayList<>();
+        ans = Integer.MAX_VALUE;
+        pick = new int[m];
 
         for (int r = 0; r < n; r++) {
             st = new StringTokenizer(br.readLine());
             for (int c = 0; c < n; c++) {
-                int number = Integer.parseInt(st.nextToken());
-                if (number == 2) {
-                    chickens.add(new int[]{r, c});
-                }
-                if (number == 1) {
-                    homes.add(new int[]{r, c});
-                }
+                int val = Integer.parseInt(st.nextToken());
+                if (val == 2) chList.add(new int[]{r, c});
+                else if (val == 1) hsList.add(new int[]{r, c});
             }
         }
-        solve(0, 0, m);
 
-        bw.write(String.valueOf(min));
+        comb(0, 0, m);
+
+        bw.write(String.valueOf(ans));
         bw.flush();
         bw.close();
     }
 
-    private static void solve(int start, int count, int m) {
-        if (count == m) {
+    private static void comb(int start, int cnt, int m) {
+        if (cnt == m) {
             int sum = 0;
-            for (int[] home : homes) {
-                int tmpMin = Integer.MAX_VALUE;
-                for (int i : combination) {
-                    int distR = Math.abs(home[0] - chickens.get(i)[0]);
-                    int distC = Math.abs(home[1] - chickens.get(i)[1]);
-                    tmpMin = Math.min(distR + distC, tmpMin);
+            for (int[] h : hsList) {
+                int d = Integer.MAX_VALUE;
+                for (int idx : pick) {
+                    int[] ch = chList.get(idx);
+                    d = Math.min(d, Math.abs(h[0] - ch[0]) + Math.abs(h[1] - ch[1]));
                 }
-                sum += tmpMin;
+                sum += d;
             }
-            min = Math.min(sum, min);
+            ans = Math.min(ans, sum);
             return;
         }
 
-        for (int i = start; i < chickens.size(); i++) {
-            combination[count] = i;
-            solve(i + 1, count + 1, m);
+        for (int i = start; i < chList.size(); i++) {
+            pick[cnt] = i;
+            comb(i + 1, cnt + 1, m);
         }
     }
 }
