@@ -1,46 +1,38 @@
 import java.util.*;
-import java.util.stream.*;
 
 class Solution {
-    public int solution(int[] queue1, int[] queue2) {
-        int answer = -1;
-        long sum1 = Arrays.stream(queue1).sum();
-        long sum2 = Arrays.stream(queue2).sum();
+    public int solution(int[] q1Arr, int[] q2Arr) {
+        long s1 = Arrays.stream(q1Arr).sum();
+        long s2 = Arrays.stream(q2Arr).sum();
         Queue<Integer> q1 = new ArrayDeque<>();
         Queue<Integer> q2 = new ArrayDeque<>();
-        offerNum(q1, queue1);
-        offerNum(q2, queue2);
-        int limit = (q1.size() + q2.size()) * 2;
-        int count = 0;
-        while (limit-- > 0) {
-            if (sum1 > sum2 && !q1.isEmpty()) {
-                int num = q1.poll();
-                q2.offer(num);
-                sum1 -= num;
-                sum2 += num;
-                count++;
-            }
-            
-            if (sum1 < sum2 && !q2.isEmpty()) {
-                int num = q2.poll();
-                q1.offer(num);
-                sum2 -= num;
-                sum1 += num;
-                count++;
-            }
-            
-            if (sum1 == sum2) {
-                answer = count;
-                break;
+        fill(q1, q1Arr);
+        fill(q2, q2Arr);
+        
+        int lim = (q1.size() + q2.size()) * 2;
+        int cnt = 0;
+        
+        while (lim-- > 0) {
+            if (s1 > s2 && !q1.isEmpty()) {
+                int x = q1.poll();
+                q2.offer(x);
+                s1 -= x;
+                s2 += x;
+                cnt++;
+            } else if (s1 < s2 && !q2.isEmpty()) {
+                int x = q2.poll();
+                q1.offer(x);
+                s2 -= x;
+                s1 += x;
+                cnt++;
+            } else if (s1 == s2) {
+                return cnt;
             }
         }
-        
-        return answer;
+        return -1;
     }
     
-    private void offerNum(Queue<Integer> queue, int[] nums) {
-        for (int num : nums) {
-            queue.offer(num);
-        }
+    private void fill(Queue<Integer> q, int[] arr) {
+        for (int x : arr) q.offer(x);
     }
 }
