@@ -1,82 +1,64 @@
 import java.util.*;
 
-// 레버를 찾고, 레버에서 탈출구로
-
 class Solution {
     
-    private int[][] mapView;
-    private int R;
-    private int C;
+    private int[][] grid;
+    private int n, m;
     
     public int solution(String[] maps) {
-        int answer = 0;
-        R = maps.length;
-        C = maps[0].length();
-        mapView = new int[R][C];
-        int[] start = new int[2];
-        int[] lever = new int[2];
-        for (int r = 0; r < R; r++) {
-            for (int c = 0; c < C; c++) {
-                char el = maps[r].charAt(c);
-                if (Objects.equals(el, 'S')) {
-                    mapView[r][c] = 1;
-                    start = new int[]{r,c};
-                }
-                if (Objects.equals(el, 'L')) {
-                    mapView[r][c] = 2;
-                    lever = new int[]{r,c};
-                }
-                if (Objects.equals(el, 'E')) {
-                    mapView[r][c] = 3;
-                }
-                if (Objects.equals(el, 'X')) {
-                    mapView[r][c] = -1;
+        n = maps.length;
+        m = maps[0].length();
+        grid = new int[n][m];
+        
+        int[] start = null;
+        int[] lever = null;
+        
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                char ch = maps[i].charAt(j);
+                if (ch == 'S') {
+                    grid[i][j] = 1;
+                    start = new int[]{i, j};
+                } else if (ch == 'L') {
+                    grid[i][j] = 2;
+                    lever = new int[]{i, j};
+                } else if (ch == 'E') {
+                    grid[i][j] = 3;
+                } else if (ch == 'X') {
+                    grid[i][j] = -1;
                 }
             }
         }
         
-        int leverTime = getTime(start[0], start[1], 2);
-        int exitTime = getTime(lever[0], lever[1], 3);
+        int timeToLever = bfs(start[0], start[1], 2);
+        int timeToExit = (timeToLever == -1) ? -1 : bfs(lever[0], lever[1], 3);
         
-        answer = leverTime + exitTime;
-        if (leverTime == -1 || exitTime == -1) {
-            answer = -1;
-        }
-        
-        return answer;
+        if (timeToLever == -1 || timeToExit == -1) return -1;
+        return timeToLever + timeToExit;
     }
     
-    private int getTime(int r, int c, int target) {
-        boolean[][] visited = new boolean[R][C];
-        int[][] directions = new int[][]{{-1,0}, {1,0}, {0,-1}, {0,1}};
-        Queue<int[]> queue = new ArrayDeque<>();
-        queue.offer(new int[]{r,c,0});
+    private int bfs(int r, int c, int target) {
+        boolean[][] visited = new boolean[n][m];
+        int[] dx = {-1, 1, 0, 0};
+        int[] dy = {0, 0, -1, 1};
+        
+        Queue<int[]> q = new ArrayDeque<>();
+        q.offer(new int[]{r, c, 0});
         visited[r][c] = true;
         
-        while (!queue.isEmpty()) {
-            int[] current = queue.poll();
-            int cR = current[0];
-            int cC = current[1];
-            int time = current[2];
+        while (!q.isEmpty()) {
+            int[] cur = q.poll();
+            int x = cur[0], y = cur[1], dist = cur[2];
             
-            if (mapView[cR][cC] == target) {
-                return time;
-            }
+            if (grid[x][y] == target) return dist;
             
-            for (int[] direction : directions) {
-                int newR = cR + direction[0];
-                int newC = cC + direction[1];
+            for (int d = 0; d < 4; d++) {
+                int nx = x + dx[d], ny = y + dy[d];
+                if (nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+                if (visited[nx][ny] || grid[nx][ny] == -1) continue;
                 
-                if (!(newR >= 0 && newR < R && newC >= 0 && newC < C)) {
-                    continue;
-                }
-                
-                if (visited[newR][newC] || mapView[newR][newC] == -1) {
-                    continue;
-                }
-                
-                visited[newR][newC] = true;
-                queue.offer(new int[]{newR, newC, time + 1});
+                visited[nx][ny] = true;
+                q.offer(new int[]{nx, ny, dist + 1});
             }
         }
         
