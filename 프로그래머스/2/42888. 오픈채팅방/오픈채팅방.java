@@ -1,43 +1,28 @@
 import java.util.*;
-import java.util.stream.*;
 
 class Solution {
-    public String[] solution(String[] record) {
-        String[] answer = {};
-        Map<String, String> nickName = new LinkedHashMap<>();
-        int idx = 0;
-        for (String r : record) {
-            String[] split = r.split(" ");
-            String command = split[0];
-            if (!Objects.equals(command, "Change")) {
-                idx++;
+    public List<String> solution(String[] record) {
+        Map<String, String> names = new HashMap<>();
+        for (int i = 0; i < record.length; i++) {
+            String[] splitedRecord = record[i].split(" ");
+            String command = splitedRecord[0];
+            String id = splitedRecord[1];
+            if (Objects.equals(command, "Enter") || Objects.equals(command, "Change")) {
+                names.put(id, splitedRecord[2]);
             }
-            if (Objects.equals(command, "Leave")) {
-                continue;
-            }
-            
-            String id = split[1];
-            String name = split[2];
-            nickName.put(id, name);
         }
-        answer = new String[idx];
-        idx = 0;
-        for (String r : record) {
-            String[] split = r.split(" ");
-            String command = split[0];
-            String id = split[1];
-            String name = nickName.get(id);
-            if (Objects.equals(command, "Change")) {
-                continue;
-            }
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < record.length; i++) {
+            String[] splitedRecord = record[i].split(" ");
+            String command = splitedRecord[0];
+            String id = splitedRecord[1];
             if (Objects.equals(command, "Enter")) {
-                answer[idx++] = name + "님이 들어왔습니다.";
+                result.add(names.get(id) + "님이 들어왔습니다.");
             }
             if (Objects.equals(command, "Leave")) {
-                answer[idx++] = name + "님이 나갔습니다.";
+                result.add(names.get(id) + "님이 나갔습니다.");
             }
         }
-        
-        return answer;
+        return result;
     }
 }
