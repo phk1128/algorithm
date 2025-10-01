@@ -1,6 +1,5 @@
 import java.util.*;
 import java.util.stream.*;
-
 class Solution {
     
     private boolean[][] visited;
@@ -9,28 +8,11 @@ class Solution {
         
     public int[] solution(String[] maps) {
         int[] answer = new int[]{-1};
-        visited = new boolean[maps.length][maps[0].length()];
-        mapView = new int[maps.length][maps[0].length()];
         directions = new int[][]{{-1,0},{1,0},{0,1},{0,-1}};
         
-        for (int r = 0; r < maps.length; r++) {
-            for (int c = 0; c < maps[0].length(); c++) {
-                char num = maps[r].charAt(c);
-                if (Character.isDigit(num)) {
-                    mapView[r][c] = Character.getNumericValue(num);
-                }
-            }
-        }
+        initializeMap(maps);
         
-        List<Integer> scores = new ArrayList<>();
-        for (int r = 0; r < mapView.length; r++) {
-            for (int c = 0; c < mapView[0].length; c++) {
-                if (visited[r][c] || mapView[r][c] == 0) {
-                    continue;
-                }
-                scores.add(getScore(r,c));
-            }
-        }
+        List<Integer> scores = findAllIslands();
         
         if (!scores.isEmpty()) {
             Collections.sort(scores);
@@ -40,35 +22,63 @@ class Solution {
         return answer;
     }
     
+    private void initializeMap(String[] maps) {
+        visited = new boolean[maps.length][maps[0].length()];
+        mapView = new int[maps.length][maps[0].length()];
+        
+        for (int r = 0; r < maps.length; r++) {
+            for (int c = 0; c < maps[0].length(); c++) {
+                char num = maps[r].charAt(c);
+                if (Character.isDigit(num)) {
+                    mapView[r][c] = Character.getNumericValue(num);
+                }
+            }
+        }
+    }
+    
+    private List<Integer> findAllIslands() {
+        List<Integer> scores = new ArrayList<>();
+        
+        for (int r = 0; r < mapView.length; r++) {
+            for (int c = 0; c < mapView[0].length; c++) {
+                if (!visited[r][c] && mapView[r][c] != 0) {
+                    scores.add(getScore(r, c));
+                }
+            }
+        }
+        
+        return scores;
+    }
+    
     public int getScore(int r, int c) {
-        int score = mapView[r][c];
         Queue<int[]> queue = new ArrayDeque<>();
-        queue.offer(new int[]{r,c});
+        queue.offer(new int[]{r, c});
         visited[r][c] = true;
         
+        int score = 0;
+        
         while (!queue.isEmpty()) {
-            
             int[] current = queue.poll();
             int cR = current[0];
             int cC = current[1];
-        
+            
+            score += mapView[cR][cC];
+            
             for (int[] direction : directions) {
                 int nR = cR + direction[0];
                 int nC = cC + direction[1];
-                if (!(nR >= 0 && nR < mapView.length && nC >= 0 && nC < mapView[0].length)) {
-                    continue;
-                }
                 
-                if (visited[nR][nC] || mapView[nR][nC] == 0) {
-                    continue;
+                if (isValidPosition(nR, nC) && !visited[nR][nC] && mapView[nR][nC] != 0) {
+                    visited[nR][nC] = true;
+                    queue.offer(new int[]{nR, nC});
                 }
-                visited[nR][nC] = true;
-                score += mapView[nR][nC];
-                queue.offer(new int[]{nR,nC});
             }
-            
         }
         
         return score;
+    }
+    
+    private boolean isValidPosition(int r, int c) {
+        return r >= 0 && r < mapView.length && c >= 0 && c < mapView[0].length;
     }
 }
