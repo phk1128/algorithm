@@ -2,90 +2,63 @@ import java.util.*;
 
 class Solution {
     
-    private int[][] mapView;
-    
-    public int[] solution(String[][] places) {
-        int[] answer = new int[places.length];
-        for (int i = 0; i < places.length; i++) {
-            String[] place = places[i];
-            mapView = new int[5][5];
-            int people = 0;
+    public List<Integer> solution(String[][] places) {
+        List<Integer> answer = new ArrayList<>();
+        char[][] mapView;
+        for (String[] place : places) {
+            mapView = new char[5][5];
             for (int r = 0; r < 5; r++) {
+                String row = place[r];
                 for (int c = 0; c < 5; c++) {
-                    int num = 0;
-                    char el = place[r].charAt(c);
-                    if (Objects.equals(el, 'P')) {
-                        num = 2;
-                        people++;
-                    }
-                    if (Objects.equals(el, 'X')) {
-                        num = -1;
-                    }
-                    mapView[r][c] = num;
+                    mapView[r][c] = row.charAt(c);
                 }
             }
-            
-            answer[i] = getResult(people);
-            
+            answer.add(calculateResult(mapView));
         }
+        
         return answer;
     }
-    
-    private int getResult(int people) {
-        
-        if (people == 0) {
-            return 1;
-        }
-        
+    private int calculateResult(char[][] mapView) {
         for (int r = 0; r < 5; r++) {
             for (int c = 0; c < 5; c++) {
-                if (mapView[r][c] == 2 && !isSafe(r,c)) {
+                if (mapView[r][c] == 'P' && !isSafe(r, c, mapView)) {
                     return 0;
                 }
             }
         }
-        
         return 1;
     }
     
-    private boolean isSafe(int r, int c) {
+    private boolean isSafe(int r, int c, char[][] mapView) {
         boolean[][] visited = new boolean[5][5];
-        int[][] directions = new int[][]{{1,0}, {-1,0}, {0,1}, {0,-1}};
+        int[] dr = new int[]{1, -1, 0, 0};
+        int[] dc = new int[]{0, 0, -1, 1};
         Queue<int[]> queue = new ArrayDeque<>();
-        queue.offer(new int[]{r,c,0});
         visited[r][c] = true;
+        queue.offer(new int[]{r,c,0});
         
         while (!queue.isEmpty()) {
-            int[] current = queue.poll();
-            int cR = current[0];
-            int cC = current[1]; 
-            int count = current[2];
-            
-            for (int[] direction : directions) {
-                int newR = cR + direction[0];
-                int newC = cC + direction[1];
-                
-                if (!(newR >= 0 && newR < 5 && newC >= 0 && newC < 5)) {
+            int[] cur = queue.poll();
+            for (int i = 0; i < 4; i++) {
+                int nR = cur[0] + dr[i];
+                int nC = cur[1] + dc[i];
+                if (!(nR >= 0 && nR < 5 && nC >= 0 && nC < 5)) {
                     continue;
                 }
-                
-                if (visited[newR][newC] || mapView[newR][newC] == -1) {
+                if (mapView[nR][nC] == 'X' || visited[nR][nC]) {
                     continue;
                 }
-    
-                if (mapView[newR][newC] == 2 && count <= 1) {
+                if (mapView[nR][nC] == 'P' && cur[2] <= 1) {
                     return false;
                 }
-                
-                if (count >= 1) {
+                if (cur[2] >= 1) {
                     continue;
                 }
-          
-                visited[newR][newC] = true;
-                queue.offer(new int[]{newR, newC, count + 1});
+                visited[nR][nC] = true;
+                queue.offer(new int[]{nR, nC, cur[2] + 1});
             }
         }
-        
         return true;
+        
     }
 }
