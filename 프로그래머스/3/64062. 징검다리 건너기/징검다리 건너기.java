@@ -7,7 +7,6 @@ class Solution {
         Deque<Integer> queue = new ArrayDeque<>();
         
         for (int i = 0; i < stones.length; i++) {
-            
             while (!queue.isEmpty() && queue.peekFirst() <= i - k) {
                 queue.pollFirst();
             }
@@ -15,7 +14,7 @@ class Solution {
             while (!queue.isEmpty() && stones[queue.peekLast()] < stones[i]) {
                 queue.pollLast();
             }
-            queue.offer(i);
+            queue.offerLast(i);
             
             if (i >= k - 1) {
                 answer = Math.min(answer, stones[queue.peekFirst()]);
