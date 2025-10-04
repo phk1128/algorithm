@@ -1,11 +1,11 @@
 import java.util.*;
+import java.util.stream.*;
 
 class Solution {
     public int[] solution(String[] gems) {
         int[] answer = new int[2];
-        Set<String> set = new HashSet<>(Arrays.asList(gems));
         Map<String, Integer> map = new HashMap<>();
-        int kind = set.size();
+        int kind = (int) Arrays.stream(gems).distinct().count();
         int start = 0;
         int count = 0;
         int min = Integer.MAX_VALUE;
