@@ -1,5 +1,4 @@
 import java.util.*;
-
 class Solution {
     
     private static String[] banned_id;
@@ -10,10 +9,6 @@ class Solution {
     
     public int solution(String[] user_id, String[] banned_id) {
         int answer = 0;
-        
-        for (int i = 0; i < banned_id.length; i++) {
-            banned_id[i] = banned_id[i].replace("*",".");
-        }
         
         this.banned_id = banned_id;
         this.user_id = user_id;
@@ -30,15 +25,22 @@ class Solution {
     private static void recursiveSolve(int depth) {
         
         if (depth == banned_id.length) {
-            String[] tmpCombi = Arrays.copyOf(combi, banned_id.length);
-            Arrays.sort(tmpCombi);
-            result.add(String.join("",tmpCombi));
+            int[] indices = new int[banned_id.length];
+            for (int i = 0; i < banned_id.length; i++) {
+                for (int j = 0; j < user_id.length; j++) {
+                    if (combi[i].equals(user_id[j])) {
+                        indices[i] = j;
+                        break;
+                    }
+                }
+            }
+            Arrays.sort(indices);
+            result.add(Arrays.toString(indices));
             return;
         }
         
         for (int i = 0; i < user_id.length; i++) {
-            String regex = banned_id[depth];
-            if (!user_id[i].matches(regex) || visited[i]) {
+            if (visited[i] || !isMatch(user_id[i], banned_id[depth])) {
                 continue;
             }
             visited[i] = true;
@@ -47,5 +49,17 @@ class Solution {
             visited[i] = false;
         }
         
+    }
+    
+    private static boolean isMatch(String user, String banned) {
+        if (user.length() != banned.length()) {
+            return false;
+        }
+        for (int i = 0; i < user.length(); i++) {
+            if (banned.charAt(i) != '*' && user.charAt(i) != banned.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
