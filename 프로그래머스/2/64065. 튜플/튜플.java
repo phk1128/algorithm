@@ -2,8 +2,7 @@ import java.util.*;
 import java.util.stream.*;
 
 class Solution {
-    public int[] solution(String s) {
-        int[] answer = {};
+    public List<Integer> solution(String s) {
         String[] splitS = s.replaceAll("[^0-9|,]", "").split(",");
         Map<String, Integer> map = new HashMap<>();
         for (String str : splitS) {
@@ -12,8 +11,9 @@ class Solution {
         
         List<String> result = new ArrayList<>(map.keySet());
         Collections.sort(result, (r1, r2) -> map.get(r2) - map.get(r1));
-        answer = result.stream().mapToInt(Integer::parseInt).toArray();
         
-        return answer;
+        return result.stream()
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
     }
 }
