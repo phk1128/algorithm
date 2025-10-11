@@ -1,54 +1,91 @@
 import java.util.*;
-
 class Solution {
-    private Map<String,Integer> mineralKind;
-    private int[][] costs;
-    private int[] combi;
-    private int answer;
     public int solution(int[] picks, String[] minerals) {
-        answer = Integer.MAX_VALUE;
-        mineralKind = new HashMap<>();
-        costs = new int[][]{{1,1,1}, {5,1,1}, {25,5,1}};
-        mineralKind.put("diamond", 0);
-        mineralKind.put("iron", 1);
-        mineralKind.put("stone", 2);
+        int answer = 0;
         int picksCount = Arrays.stream(picks).sum();
-        combi = new int[picksCount];
+        int len = Math.min((int) Math.ceil(minerals.length / 5.0), picksCount);
         
-        recursiveSolve(0,picksCount,picks,minerals);
+        List<MineralGroup> mineralGroups = new ArrayList<>();
+        
+        for (int i = 0; i < len; i++) {
+            int start = i * 5;
+            int end = Math.min(start + 5, minerals.length);
+            int stoneCost = 0;
+            
+            for (int j = start; j < end; j++) {
+                String mineral = minerals[j];
+                if (mineral.equals("diamond")) {
+                    stoneCost += 25;
+                } else if (mineral.equals("iron")) {
+                    stoneCost += 5;
+                } else {
+                    stoneCost += 1;
+                }
+            }
+            
+            mineralGroups.add(new MineralGroup(i, stoneCost, start, end));
+        }
+        
+        Collections.sort(mineralGroups, (g1, g2) -> g2.cost - g1.cost);
+        
+        int[] select = new int[len];
+        Arrays.fill(select, -1);
+        
+        for (MineralGroup group : mineralGroups) {
+            for (int pickType = 0; pickType < picks.length; pickType++) {
+                if (picks[pickType] > 0) {
+                    picks[pickType]--;
+                    select[group.index] = pickType;
+                    break;
+                }
+            }
+        }
+        
+        for (int i = 0; i < len; i++) {
+            int pickNum = select[i];
+            if (pickNum == -1) continue;
+            
+            int start = i * 5;
+            int end = Math.min(start + 5, minerals.length);
+            
+            for (int j = start; j < end; j++) {
+                String mineral = minerals[j];
+                answer += getFatigue(pickNum, mineral);
+            }
+        }
         
         return answer;
     }
-    private void recursiveSolve(int depth, int limit, int[] picks, String[] minerals) {
-        if (depth == limit) {
-            answer = Math.min(answer, getCost(minerals));
-            return;
-        }
-        
-        for (int i = 0; i < picks.length; i++) {
-            if (picks[i] <= 0) {
-                continue;
+    
+    private int getFatigue(int pickNum, String mineral) {
+        if (pickNum == 0) {
+            return 1;
+        } else if (pickNum == 1) {
+            if (mineral.equals("diamond")) {
+                return 5;
             }
-            combi[depth] = i;
-            picks[i]--;
-            recursiveSolve(depth + 1, limit, picks, minerals);
-            picks[i]++;
+            return 1;
+        } else {
+            if (mineral.equals("diamond")) {
+                return 25;
+            } else if (mineral.equals("iron")) {
+                return 5;
+            }
+            return 1;
         }
     }
     
-    private int getCost(String[] minerals) {
-        int idx = 0;
-        int cost = 0;
-        for (int i = 0; i < combi.length; i++) {
-            int pick = combi[i];
-            int count = 5;
-            while (count-- > 0) {
-                if (idx == minerals.length) {
-                    break;
-                }
-                cost += costs[pick][mineralKind.get(minerals[idx++])];
-            }
+    static class MineralGroup {
+        int index;
+        int cost;
+        int start;
+        int end;
+        
+        MineralGroup(int index, int cost, int start, int end) {
+            this.index = index;
+            this.cost = cost;
+            this.start = start;
+            this.end = end;
         }
-        return cost;
     }
 }
