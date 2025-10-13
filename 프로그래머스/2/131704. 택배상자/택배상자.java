@@ -1,5 +1,4 @@
 import java.util.*;
-
 class Solution {
     public int solution(int[] order) {
         int answer = 0;
@@ -7,21 +6,22 @@ class Solution {
         Stack<Integer> stack = new Stack<>();
         
         int idx = 0;
-        for (int i = 1; i <= order.length; i++) {
-            
-            stack.push(i);
-            
-            while (!stack.isEmpty()) {
-                if (stack.peek() == order[idx]) {
-                    stack.pop();
-                    idx++;
-                    answer++;
-                } else {
-                    break;
-                }
+        int i = 1;
+        
+        while (idx < order.length) {
+            if (!stack.isEmpty() && stack.peek() == order[idx]) {
+                stack.pop();
+                idx++;
+                answer++;
+            }
+            else if (i <= order.length) {
+                stack.push(i);
+                i++;
+            }
+            else {
+                break;
             }
         }
-        
         
         return answer;
     }
