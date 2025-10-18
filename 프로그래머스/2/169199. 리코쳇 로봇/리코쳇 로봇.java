@@ -102,8 +102,6 @@ class Solution {
                 c = newC;
             }
         }
-        
         return newPosition;
-        
     }
 }
