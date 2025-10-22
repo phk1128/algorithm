@@ -1,21 +1,21 @@
 class Solution {
     public int[] solution(String s) {
-int removeCount = 0;
+        int removeCount = 0;
         int conversionCount = 0;
         
-        while (!s.equals("1")) {
+        while (s.length() > 1) {
             conversionCount++;
-            int countOfOnes = 0;
+            int ones = 0;
             
             for (char c : s.toCharArray()) {
-                if (c == '0') {
-                    removeCount++;
+                if (c == '1') {
+                    ones++;
                 } else {
-                    countOfOnes++;
+                    removeCount++;
                 }
             }
             
-            s = Integer.toBinaryString(countOfOnes);
+            s = Integer.toBinaryString(ones);
         }
         
         return new int[]{conversionCount, removeCount};
