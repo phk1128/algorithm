@@ -10,7 +10,6 @@ class Solution {
         long maxTime = (long)times[times.length - 1] * n;
         binarySearch(1, maxTime, n, times);
         answer = minTime;
-        
         return answer;
     }
     
