@@ -15,7 +15,6 @@ class Solution {
             pulse0 *= -1;
             pulse1 *= -1;
         }
-        
         return answer;
     }
 }
