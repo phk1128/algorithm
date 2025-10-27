@@ -1,30 +1,28 @@
 import java.util.*;
-import java.util.stream.*;
+
 class Solution {
-    private List<int[]> result;
     public int[][] solution(int n) {
-        int[][] answer = {};
-        result = new ArrayList<>();
+        List<int[]> result = new ArrayList<>();
+        Stack<int[]> stack = new Stack<>();
         
-        recursiveSolve(1,2,3,n);
+        stack.push(new int[]{n, 1, 2, 3});
         
-        answer = new int[result.size()][];
-        for (int i = 0; i < result.size(); i++) {
-            answer[i] = result.get(i);
+        while (!stack.isEmpty()) {
+            int[] current = stack.pop();
+            int disks = current[0];
+            int start = current[1];
+            int mid = current[2];
+            int end = current[3];
+            
+            if (disks == 1) {
+                result.add(new int[]{start, end});
+            } else {
+                stack.push(new int[]{disks-1, mid, start, end});
+                stack.push(new int[]{1, start, mid, end});
+                stack.push(new int[]{disks-1, start, end, mid});
+            }
         }
-        return answer;
-    }
-    
-    private void recursiveSolve(int start, int mid, int end, int n) {
         
-        if (n == 1) {
-            result.add(new int[]{start, end});
-            return;
-        }
-        
-        recursiveSolve(start, end, mid, n-1);
-        result.add(new int[]{start, end});
-        recursiveSolve(mid, start, end, n-1);
-        
+        return result.toArray(new int[result.size()][]);
     }
 }
