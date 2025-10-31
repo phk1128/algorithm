@@ -12,7 +12,6 @@ class Solution {
         answer = result.indexOf(word);
         return answer;
     }
-    
     private void dfs(String word, String tempStr, int count) {
         result.add(tempStr);
         if (Objects.equals(word, result)) {
