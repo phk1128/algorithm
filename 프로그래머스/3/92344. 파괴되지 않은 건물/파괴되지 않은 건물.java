@@ -44,9 +44,7 @@ class Solution {
                 }
             }
         }
-        
         answer = count;
-            
         return answer;
     }
 }
