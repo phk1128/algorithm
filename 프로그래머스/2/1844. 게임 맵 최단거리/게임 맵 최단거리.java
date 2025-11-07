@@ -36,7 +36,6 @@ class Solution {
                 visited[nR][nC] = true;
             }
         }
-        
         return answer;
     }
 }
