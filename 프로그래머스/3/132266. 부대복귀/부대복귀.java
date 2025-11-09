@@ -2,73 +2,60 @@ import java.util.*;
 import java.util.stream.*;
 
 class Solution {
-
-    private List<Edge>[] graph;
-    private int[] cost;
-    private boolean[] visited;
+    private static List<int[]>[] graph;
+    private static int[] costs;
+    private static boolean[] visited;
     
     public int[] solution(int n, int[][] roads, int[] sources, int destination) {
         int[] answer = {};
         graph = new ArrayList[n + 1];
+        costs = new int[n + 1];
         visited = new boolean[n + 1];
-        cost = new int[n + 1];
-        Arrays.fill(cost, Integer.MAX_VALUE);
+        Arrays.fill(costs, Integer.MAX_VALUE);
         
         for (int i = 1; i <= n; i++) {
             graph[i] = new ArrayList<>();
         }
-        
-        for (int[] road : roads) {
-            int start = road[0];
-            int end = road[1];
-            int weight = 1;
-            graph[start].add(new Edge(end, weight));
-            graph[end].add(new Edge(start, weight));
+        for (int[] r : roads) {
+            int s = r[0];
+            int e = r[1];
+            int w = 1;
+            graph[s].add(new int[]{e, w});
+            graph[e].add(new int[]{s, w});
         }
         
         dijkstra(destination);
         
-        List<Integer> result = new ArrayList<>();
-        
-        for (int s : sources) {
-            result.add(cost[s] == Integer.MAX_VALUE ? -1 : cost[s]);
-        }
-        return result.stream().mapToInt(Integer::intValue).toArray();
+        return Arrays.stream(sources).map(s -> {
+            int cost = costs[s];
+            if (cost == Integer.MAX_VALUE) {
+                cost = -1;
+            }
+            return cost;
+        }).toArray();
     }
     
-    private void dijkstra(int start) {
-        PriorityQueue<Edge> queue = new PriorityQueue<>((e1, e2) -> e1.weight - e2.weight);
-        cost[start] = 0;
-        queue.offer(new Edge(start, 0));
+    private void dijkstra(int d) {
+        PriorityQueue<int[]> queue = new PriorityQueue<>((edge1, edge2) -> edge1[1] - edge2[1]);
+        queue.offer(new int[]{d, 0});
+        costs[d] = 0;
         
         while (!queue.isEmpty()) {
-            Edge edge = queue.poll();
-            int node = edge.node;
-            int weight = edge.weight;
+            int[] cur = queue.poll();
+            int start = cur[0];
             
-            if (visited[node]) {
+            if (visited[start]) {
                 continue;
             }
+            visited[start] = true;
             
-            visited[node] = true;
-            
-            for (Edge e : graph[node]) {
-                if (cost[e.node] > cost[node] + e.weight) {
-                    cost[e.node] = cost[node] + e.weight;
-                    queue.offer(new Edge(e.node, cost[e.node]));
+            for (int[] edge : graph[start]) {
+                int end = edge[0];
+                if (costs[end] > costs[start] + edge[1]) {
+                    costs[end] = costs[start] + edge[1];
+                    queue.offer(new int[]{end, costs[end]});
                 }
             }
-        }
-    }
-    
-    
-    static class Edge {
-        int node;
-        int weight;
-        
-        public Edge(int node, int weight) {
-            this.node = node;
-            this.weight = weight;
         }
     }
 }
