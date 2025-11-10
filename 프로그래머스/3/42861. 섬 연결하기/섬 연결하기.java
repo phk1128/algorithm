@@ -1,74 +1,46 @@
 import java.util.*;
 
 class Solution {
-    private int answer;
-    private List<Edge>[] graph;
-    private boolean[] visited;
-    
+    private int[] parents;
     public int solution(int n, int[][] costs) {
-        answer = 0;
-        graph = new ArrayList[n];
-        visited = new boolean[n];
-        
-        for (int i = 0; i < n; i++) {
-            graph[i] = new ArrayList<>();
+        int answer = 0;
+        parents = new int[n + 1];
+        for (int i = 1; i <= n; i++) {
+            parents[i] = i;
         }
+        Arrays.sort(costs, (c1,c2) -> c1[2] - c2[2]);
         
         for (int[] cost : costs) {
-            int start = cost[0];
-            int end = cost[1];
-            int weight = cost[2];
-        
-            graph[start].add(new Edge(end, weight));
-            graph[end].add(new Edge(start,weight));
+            if (union(cost[0], cost[1])) {
+                answer += cost[2];
+            }
         }
-        
-        prim();
         
         return answer;
     }
-    
-    private void prim() {
-        PriorityQueue<Edge> queue = new PriorityQueue<>();
-        queue.offer(new Edge(0,0));
-        
-        while(!queue.isEmpty()) {
-            Edge edge = queue.poll();
-            int end = edge.getEnd();
-            int weight = edge.getWeight();
-            
-            if (visited[end]) {
-                continue;
-            }
-            visited[end] = true;
-            answer += weight;
-            
-            for (Edge e : graph[end]) {
-                queue.offer(e);
-            }
+    private int find(int x) {
+        if (x == parents[x]) {
+            return x;
         }
+        return find(parents[x]);
     }
     
-    static class Edge implements Comparable<Edge> {
-        private int end;
-        private int weight;
+    private boolean union(int x, int y) {
+        x = find(x);
+        y = find(y);
         
-        public Edge(int end, int weight) {
-            this.end = end;
-            this.weight = weight;
+        if (x == y) {
+            return false;
         }
         
-        public int getEnd() {
-            return this.end;
+        if (x > y) {
+            parents[x] = y;
         }
         
-        public int getWeight() {
-            return this.weight;
+        if (x < y) {
+            parents[y] = x;
         }
         
-        @Override
-        public int compareTo(Edge o) {
-            return this.weight - o.weight;
-        }
+        return true;
     }
 }
