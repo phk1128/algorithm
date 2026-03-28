@@ -57,7 +57,7 @@ class Solution {
                     if (pauseDiff > 0) {
                         time += remaining;
                         stack.push(new Assignment(pause.name, 0, pauseDiff));
-                        break;
+                        continue;
                     }
 
                     time += pause.playtime;
