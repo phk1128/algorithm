@@ -1,34 +1,37 @@
 import java.util.*;
-import java.util.stream.*;
 
 class Solution {
     public int[] solution(String[] gems) {
-        int[] answer = {};
-        answer = new int[2];
-        int kind = (int) Arrays.stream(gems).distinct().count();
-        int s = 0;
-        int count = 0;
-        int min = Integer.MAX_VALUE;
-        Map<String,Integer> map = new HashMap<>();
-        for (int i = 0; i < gems.length; i++) {
-            if (!map.containsKey(gems[i])) {
-                count++;
-            }
-            map.put(gems[i], map.getOrDefault(gems[i], 0) + 1);
+        // 보석 종류 집합 구하기
+        Set<String> gemKinds = new HashSet<>(Arrays.asList(gems));
+        int kindCount = gemKinds.size();
+        
+        Map<String, Integer> window = new HashMap<>();
+        int minLength = Integer.MAX_VALUE;
+        int left = 0, right = 0;
+        int answerLeft = 0, answerRight = 0;
+        
+        while (right < gems.length) {
+            // 오른쪽 끝에 보석 추가
+            window.put(gems[right], window.getOrDefault(gems[right], 0) + 1);
+            right++;
             
-            while (map.get(gems[s]) > 1) {
-                map.replace(gems[s], map.get(gems[s]) - 1);
-                s++;
-            }
-            
-            if (kind == count) {
-                if (i - s < min) {
-                    min = i - s;
-                    answer[0] = s + 1;
-                    answer[1] = i + 1;
+            // 모든 종이 포함됐을 때 왼쪽 윈도우 줄이기 시도
+            while (window.size() == kindCount) {
+                if (right - left < minLength) {
+                    minLength = right - left;
+                    answerLeft = left;
+                    answerRight = right; // right는 exclusive
                 }
+                // 왼쪽 끝 보석 제거
+                window.put(gems[left], window.get(gems[left]) - 1);
+                if (window.get(gems[left]) == 0) {
+                    window.remove(gems[left]);
+                }
+                left++;
             }
         }
-        return answer;
+        // 1-indexed return 요구
+        return new int[] {answerLeft + 1, answerRight};
     }
 }
