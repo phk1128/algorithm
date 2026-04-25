@@ -1,29 +1,24 @@
 import java.util.*;
 
 class Solution {
-    private int[] dp;
     public int solution(int k, int[] tangerine) {
-        int answer = 0;
-        dp = new int[10000001];
-        
+        // 크기별 개수 카운팅
+        Map<Integer, Integer> countMap = new HashMap<>();
         for (int t : tangerine) {
-            dp[t]++;
+            countMap.put(t, countMap.getOrDefault(t, 0) + 1);
         }
         
-        Arrays.sort(dp);
-        int count = 0;
-        for (int i = 10000000; i >= 1; i--) {
-            k -= dp[i];
-            count++;
-            
-            if (k <= 0) {
-                answer = count;
-                break;
-            }
+        // 개수 기준 내림차순 정렬
+        List<Integer> counts = new ArrayList<>(countMap.values());
+        counts.sort(Collections.reverseOrder());
+        
+        int types = 0;
+        int sum = 0;
+        for (int cnt : counts) {
+            sum += cnt;
+            types++;
+            if (sum >= k) break;
         }
-        
-        
-        return answer;
+        return types;
     }
-    
 }
