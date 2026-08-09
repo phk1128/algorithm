@@ -1,48 +1,35 @@
-from collections import defaultdict
+from collections import deque
 
 def solution(n, wires):
     answer = float('inf')
-    for i in range(n-1):
+    for i in range(n - 1):
+        graph = []
+        for j in range(n + 1):
+            graph.append([])
+
         tmp_wires = wires.copy()
         del tmp_wires[i]
-        answer = min(answer, count(tmp_wires, n))
+        
+        for wire in tmp_wires:
+            graph[wire[0]].append(wire[1])
+            graph[wire[1]].append(wire[0])
+        result = bfs(n, graph)
+        answer = min(answer, abs(result - (n-result)))
     return answer
-    
-def count(wires, n):
-    global parents
-    parents = []
-    for i in range(n + 1):
-        parents.append(i)
-    
-    for wire in wires:
-        union(wire[0], wire[1])
-    
-    s = set()
-    for i in range(1, n + 1):
-        s.add(find(i))
-    
-    map = defaultdict(int)
-    if (len(s) == 2):
-        a, b = s
-        for i in range(1, n + 1):
-            map[find(i)] += 1
-        return abs(map[a] - map[b])
-    return float('inf')
+        
 
-def find(x):
-    if(parents[x] == x):
-        return x
-    return find(parents[x])
-
-def union(x, y):
-    x = find(x)
-    y = find(y)
-
-    if (x > y):
-        parents[x] = y
-        return True
-    if (x < y):
-        parents[y] = x
-        return True
-    return False
-    
+def bfs(n, graph):
+    visited = [False] * (n + 1)
+    queue = deque()
+    queue.append(1)
+    visited[1] = True
+    cnt = 1
+    while queue:
+        cur = queue.popleft()
+        for node in graph[cur]:
+           if visited[node]:
+               continue
+           cnt += 1
+           visited[node] = True
+           queue.append(node)
+    return cnt
